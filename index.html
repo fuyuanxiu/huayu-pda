@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+<script type="text/javascript" src="js/jquery.js"></script>
+<link rel="stylesheet" href="css/comon0.css">
+
+<script src="js/mui.min.js"></script>
+		<script src="js/api.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+
+<script type="text/javascript" src="js/createSpeed.js"></script> 
+</head>
+	<script>
+	$(window).load(function(){  
+             $(".loading").fadeOut()
+            })  
+			
+/****/
+$(document).ready(function(){
+	var whei=$(window).width()
+	$("html").css({fontSize:whei/20})
+	$(window).resize(function(){
+		var whei=$(window).width()
+	 $("html").css({fontSize:whei/20})
+});
+	});
+	</script>
+	<script type="text/javascript" src="js/echarts.min.js"></script> 
+	 <script language="JavaScript" src="js/js.js"></script>
+<body>
+<!-- <div class="canvas" style="opacity: .1">
+	<iframe frameborder="0" src="js/index.html" style="width: 100%; height: 100%"></iframe>
+	</div>
+<div class="loading">
+  <div class="loadbox"> <img src="picture/loading.gif"> 页面加载中... </div>
+</div> -->
+<div class="head">
+	<div class="index_nav">
+		<ul style="height: 30px; margin-bottom: 0px;">
+			<li class="l_left total_chose_fr nav_active"><b>主页面</b></li>
+			<li class="l_left total_chose_pl" >产出信息</li>
+			<li class="l_left total_chose_pl">设备效率</li>
+		</ul>
+	</div>
+  <h1>注塑车间</h1>
+  <div class="weather"><span id="showTime" style="color: #fffff;font-weight:bold;"></span></div>
+</div>
+	<script>
+var t = null;
+    t = setTimeout(time,1000);//開始运行
+    function time()
+    {
+       clearTimeout(t);//清除定时器
+       dt = new Date();
+		var y=dt.getFullYear();
+		var mt=dt.getMonth()+1;
+		var day=dt.getDate();
+       var h=dt.getHours();//获取时
+       var m=dt.getMinutes();//获取分
+       var s=dt.getSeconds();//获取秒
+       document.getElementById("showTime").innerHTML = y+"年"+mt+"月"+day+"-"+h+"时"+m+"分"+s+"秒";
+       t = setTimeout(time,1000); //设定定时器，循环运行     
+    } 
+ 
+</script>
+<div class="mainbox">
+
+	<div class="mui-row" >
+		<div class="mui-col-sm-6 mui-col-xs-12 " style="padding-right: 0.125rem;">
+			<div class="boxall" style="height: 10.15rem;">
+			  <div class="alltitle">生产机器</div>
+			  <div class="allnav" >
+				  <ul class="mui-table-view " id="list" style="  background-color:transparent;border: none;">
+				  	<li class="mui-table-view-cell mui-row" style="">
+						<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-yunhangzhong" style="color:#90EE90;"></div>
+								 	<span>S1</span>
+								 </div>
+							</span> 
+							<div class="mui-media-body">
+							    5103-202003200001
+								SRC-1225 底壳
+								<div id="echart0" style="height:1.15rem"></div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+				  		<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-yunhangzhong" style="color:#90EE90;"></div>
+								 	<span>S2</span>
+								 </div>
+							</span> 
+							
+							<div class="mui-media-body" >
+							    5103-202003200002
+								SRC-1225 底壳
+								 <div id="qywclpm3" style="padding-top: 0rem;">
+								 </div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+				  	</li>
+				  	<li class="mui-table-view-cell mui-row" >
+						<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-weiyunhang" style="color:#A9A9A9;"></div>
+								 	<span>S3</span>
+								 </div>
+							</span> 
+							
+							<div class="mui-media-body" >
+							    5103-202003200002
+								SRC-1225 底壳
+								 <div id="qywclpm9" style="padding-top: 0rem;">
+								 </div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+						<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-yunhangzhong" style="color:#90EE90;"></div>
+								 	<span>S4</span>
+								 </div>
+							</span> 
+							
+							<div class="mui-media-body" >
+							    5103-202003200002
+								SRC-1225 底壳
+								 <div id="qywclpm2" style="padding-top: 0rem;">
+								 </div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+				  	</li>
+					<li class="mui-table-view-cell mui-row" >
+						<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-yunhangzhong" style="color:#90EE90;"></div>
+								 	<span>S5</span>
+								 </div>
+							</span> 
+							
+							<div class="mui-media-body" >
+							    5103-202003200002
+								SRC-1225 底壳
+								 <div id="qywclpm4" style="padding-top: 0rem;">
+								 </div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+						<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-tingji" style="color:#FFA07A;"></div>
+								 	<span>S6</span>
+								 </div>
+							</span> 
+							
+							<div class="mui-media-body" >
+							    5103-202003200002
+								SRC-1225 底壳
+								 <div id="qywclpm5" style="padding-top: 0rem;">
+								 </div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+					</li>
+					<li class="mui-table-view-cell mui-row" >
+						<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-yunhangzhong" style="color:#90EE90;"></div>
+								 	<span>S7</span>
+								 </div>
+							</span> 
+							
+							<div class="mui-media-body" >
+							    5103-202003200002
+								SRC-1225 底壳
+								 <div id="qywclpm6" style="padding-top: 0rem;">
+								 </div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+						<div class="mui-media mui-col-sm-6 mui-col-xs-6">
+							<span class="mui-media-object mui-pull-left " >
+								 <div class="pers_icodiv" >
+								 	<div class="icon iconfont icon-yunhangzhong" style="color:#90EE90;"></div>
+								 	<span>S8</span>
+								 </div>
+							</span> 
+							
+							<div class="mui-media-body" >
+							    5103-202003200002
+								SRC-1225 底壳
+								 <div id="qywclpm7" style="padding-top: 0rem;">
+								 </div>
+							    <p class='mui-ellipsis'></p>
+							</div>
+						</div>
+					</li>
+				  </ul> 
+			  </div>
+			  <div class="boxfoot"></div> 
+			</div>
+				<!-- <ul class="mui-table-view mui-row clearfix " id="list" >
+					<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6" data-line="S1">
+						<span class="mui-media-object mui-pull-left objectSpan" >
+						     <span >S1</span>  
+						</span>
+						<div class="mui-media-body">
+						    5103-202003200001
+						    <p class='mui-ellipsis'>SMT A面</p>
+						</div>
+					</li>
+					<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6" data-line="S1">
+						<span class="mui-media-object mui-pull-left objectSpan" >
+						     <span >S2</span>  
+						</span>
+						<div class="mui-media-body">
+						    5103-202003200002
+						    <p class='mui-ellipsis'>SMT A面</p>
+						</div>
+					</li>
+					<div class="boxfoot"></div>
+				</ul> -->
+			
+		</div>
+		<div class="mui-col-sm-6 mui-col-xs-12"  >
+			<div class="mui-row" style="padding-right:0.35rem;">
+				<div class="boxall mui-col-sm-6 mui-col-xs-12" style="height: 5rem;">
+				  <div class="alltitle">在线人数</div>
+				  <div class="allnav" id="echart1"></div>
+				  <div class="boxfoot"></div> 
+				</div>
+				<div class="boxall mui-col-sm-6 mui-col-xs-12" style="height: 5rem;" >
+				  <div class="alltitle">产出入库</div>
+				  <div class="allnav" id="echart3"></div>
+				  <div class="boxfoot"></div>
+				</div>
+				<div class="boxall mui-col-sm-6 mui-col-xs-12" style="height: 5rem;" >
+				  <div class="alltitle">运行状态</div>
+				  <div class="allnav" id="echart2"></div>
+				  <div class="boxfoot"></div>
+				</div>
+				
+				<div class="boxall mui-col-sm-6 mui-col-xs-12" style="height: 5rem;">
+				  <div class="alltitle">机时统计</div>
+				  <div class="allnav" id="echart4"></div>
+				  <div class="boxfoot"></div>
+				</div>
+			</div>
+			
+		</div>
+	</div>	
+	
+</div>
+
+
+<!-- <div class="mainbox">
+  <ul class="clearfix">
+    <li>
+      <div class="boxall" style="height: 3.2rem">
+        <div class="alltitle">模块标题样式</div>
+        <div class="allnav" id="echart1"></div>
+        <div class="boxfoot"></div>
+      </div>
+      <div class="boxall" style="height: 3.2rem">
+        <div class="alltitle">模块标题样式</div>
+        <div class="allnav" id="echart2"></div>
+        <div class="boxfoot"></div>
+      </div>
+      <div class="boxall" style="height: 3.2rem">
+        <div style="height:100%; width: 100%;">
+		  	<div class="sy" id="fb1"></div>
+				<div class="sy" id="fb2"></div>
+				<div class="sy" id="fb3"></div>
+		  </div>
+        <div class="boxfoot">
+			
+		  </div>
+      </div>
+    </li>
+    <li>
+      <div class="bar">
+        <div class="barbox">
+          <ul class="clearfix">
+            <li class="pulll_left counter">12581189</li>
+            <li class="pulll_left counter">3912410</li>
+          </ul>
+        </div>
+        <div class="barbox2">
+          <ul class="clearfix">
+            <li class="pulll_left">2018年总收入情况 </li>
+            <li class="pulll_left">2018年总支出情况</li>
+          </ul>
+        </div>
+      </div>
+      <div class="map">
+        <div class="map1"><img src="picture/lbx.png"></div>
+        <div class="map2"><img src="picture/jt.png"></div>
+        <div class="map3"><img src="picture/map.png"></div>
+        <div class="map4" id="map_1"></div>
+      </div>
+    </li>
+    <li>
+          <div class="boxall" style="height:3.4rem">
+        <div class="alltitle">模块标题样式</div>
+        <div class="allnav" id="echart4"></div>
+        <div class="boxfoot"></div>
+      </div>
+      <div class="boxall" style="height: 3.2rem">
+        <div class="alltitle">模块标题样式</div>
+        <div class="allnav" id="echart5"></div>
+        <div class="boxfoot"></div>
+      </div>
+      <div class="boxall" style="height: 3rem">
+        <div class="alltitle">模块标题样式</div>
+        <div class="allnav" id="echart6"></div>
+        <div class="boxfoot"></div>
+      </div>
+    </li>
+  </ul>
+</div>
+<div class="back"></div> -->
+
+
+<!-- <script type="text/javascript" src="js/china.js"></script> 
+<script type="text/javascript" src="js/area_echarts.js"></script> -->
+		<script type="text/javascript" charset="utf-8">
+			mui.plusReady(function() {
+				/* var pieChart = echarts.init(byId('echart2'));
+				pieChart.setOption(chartOption);
+				window.addEventListener("resize",function(){
+				    pieChart.resize();
+				}); */
+				 //mui("#kaiji1").progressbar({progress:90}).show();
+			})	
+			var byId = function(id) {
+			    return document.getElementById(id);
+			};	
+					 var qywclpm = new CreateSpeed({
+					        id:"qywclpm",
+					        icon:"icon/区域完成率.png",
+					        title:"区域完成率排名",
+					        max:null
+					    });
+					    qywclpm.setData([
+					        {"name":"开机率","data":"90%","color":"#55DAED"},
+					        {"name":"OEE","data":"88%","color":"#3F80D2"}
+					    ]); 
+						
+						var qywclpm1 = new CreateSpeed({
+						       id:"qywclpm1",
+						       icon:"icon/区域完成率.png",
+						       title:"区域完成率排名",
+						       max:null
+						   });
+						   qywclpm1.setData([
+						       {"name":"开机率","data":"90%","color":"#55DAED"},
+						       {"name":"OEE","data":"88%","color":"#3F80D2"}
+						   ]); 
+						   
+						   var qywclpm2 = new CreateSpeed({
+						          id:"qywclpm2",
+						          icon:"icon/区域完成率.png",
+						          title:"区域完成率排名",
+						          max:null
+						      });
+						      qywclpm2.setData([
+						          {"name":"开机率","data":"90%","color":"#55DAED"},
+						          {"name":"OEE","data":"88%","color":"#3F80D2"}
+						      ]); 
+							  var qywclpm3 = new CreateSpeed({
+							         id:"qywclpm3",
+							         icon:"icon/区域完成率.png",
+							         title:"区域完成率排名",
+							         max:null
+							     });
+							     qywclpm3.setData([
+							         {"name":"开机率","data":"90%","color":"#55DAED"},
+							         {"name":"OEE","data":"88%","color":"#3F80D2"}
+							     ]); 
+								 var qywclpm4 = new CreateSpeed({
+								        id:"qywclpm4",
+								        icon:"icon/区域完成率.png",
+								        title:"区域完成率排名",
+								        max:null
+								    });
+								    qywclpm4.setData([
+								        {"name":"开机率","data":"90%","color":"#55DAED"},
+								        {"name":"OEE","data":"88%","color":"#3F80D2"}
+								    ]); 
+									var qywclpm5 = new CreateSpeed({
+									       id:"qywclpm5",
+									       icon:"icon/区域完成率.png",
+									       title:"区域完成率排名",
+									       max:null
+									   });
+									   qywclpm5.setData([
+									       {"name":"开机率","data":"90%","color":"#55DAED"},
+									       {"name":"OEE","data":"88%","color":"#3F80D2"}
+									   ]); 
+							   var qywclpm6 = new CreateSpeed({
+									  id:"qywclpm6",
+									  icon:"icon/区域完成率.png",
+									  title:"区域完成率排名",
+									  max:null
+								  });
+								  qywclpm6.setData([
+									  {"name":"开机率","data":"90%","color":"#55DAED"},
+									  {"name":"OEE","data":"88%","color":"#3F80D2"}
+								  ]); 
+								var qywclpm7 = new CreateSpeed({
+									   id:"qywclpm7",
+									   icon:"icon/区域完成率.png",
+									   title:"区域完成率排名",
+									   max:null
+								   });
+								   qywclpm7.setData([
+									   {"name":"开机率","data":"90%","color":"#55DAED"},
+									   {"name":"OEE","data":"88%","color":"#3F80D2"}
+								   ]); 
+								   var qywclpm9 = new CreateSpeed({
+								   	   id:"qywclpm9",
+								   	   icon:"icon/区域完成率.png",
+								   	   title:"区域完成率排名",
+								   	   max:null
+								      });
+								      qywclpm9.setData([
+								   	   {"name":"开机率","data":"90%","color":"#55DAED"},
+								   	   {"name":"OEE","data":"88%","color":"#3F80D2"}
+								      ]);
+			</script>
+</body>
+</html>

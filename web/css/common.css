@@ -1,0 +1,46 @@
+.mui-content {
+				margin-top: 2px;
+			}
+
+			/** 自定义文字*/
+			.mui-switch {
+				width: 7.5rem;
+			}
+			.mui-switch.mui-active .mui-switch-handle {
+				transform: translate(88px, 0px);
+			}
+			.mui-switch:before {
+				content: '否';
+				color: #999;
+			}
+
+			.mui-switch.mui-active:before {
+				content: '是';
+				color: #fff;
+			}
+			 .radio_inline{  
+					display: inline-block;  
+					width: 65%;  
+				}  
+				.radio_inline label{  
+					width: 48%;  
+					padding-left: 1.5625rem; 
+					padding-right: 5px;  
+				}  
+				.radio_inline input[type=radio]{  
+					width: 9%;               
+					right: auto;  
+				} 
+				.mui-badge1 {
+					padding: 0px;
+					width: 65%;
+					float: right;
+					line-height: 42px;
+					font-size: 14px;
+				}
+				.mui-btn{
+					width: 100%;
+				}
+				.mui-input-row .mui-icon{
+					color:#79CDCD;
+				}

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>打印设置</title>
+		<script src="./js/mui.min.js"></script>
+		<script src="./js/api.js"></script>
+		<link href="./css/mui.min.css" rel="stylesheet" />
+		<script src="./js/jquery-1.11.1.js"></script>
+		<script src="./js/jquery.xml2json.js.js"></script>
+		<!--选择器-->
+		<script src="./js/mui.picker.min.js"></script>
+		<link href="./css/mui.picker.css" rel="stylesheet" />
+		<!--end选择器-->
+		<style type="text/css">
+			.mui-content {
+				margin-top: 12px;
+			}
+
+			.mui-btn {
+				width: 80px;
+			}
+
+			.ulcss {
+				margin-top: 0.625rem;
+			}
+
+			.acss a {
+				text-align: center;
+				color: #fff;
+				text-decoration: none;
+				/* background-color: rgb(100,149,237); */
+			}
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">打印设置</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group">
+				<div class="mui-input-row">
+					<label>PDA地址:</label>
+					<input id="pdaMac" type="text" class="mui-input-clear" placeholder="请输入PDA的MAC地址">
+				</div>
+				<div class="mui-input-row">
+					<label>打印地址:</label>
+					<input id="printMac" type="text" class="mui-input-clear" placeholder="请输入打印机MAC地址">
+				</div>
+			</form>
+			<ul class="mui-table-view ulcss">
+				<li class="mui-table-view-cell acss" style="background-color: rgb(153,204,153);" id="sureBtn">
+					<a>保存</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view ulcss">
+				<li class="mui-table-view-cell acss" style="background-color: rgb(153,204,153);" id="printBtn">
+					<a>打印测试</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view ulcss">
+				<li class="mui-table-view-cell acss" style="background-color: rgb(255,153,102);" id="quitBtn">
+					<a>退出</a>
+				</li>
+			</ul>
+		</div>
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+			var uuid, device, bluetoothSocket, mac;
+			mui.plusReady(function() {
+				getMac();
+				//确定
+				document.getElementById("sureBtn").addEventListener('tap', function() {
+					//确定逻辑
+					doSure();
+				})
+				//打印按钮
+				document.getElementById("printBtn").addEventListener('tap', function() {
+					//打印逻辑
+					doPrint();
+				})
+				//退出按钮
+				document.getElementById("quitBtn").addEventListener('tap', function() {
+					OpenWindow('main', 'main.html', {});
+				})
+				//PDAMAC地址输入后回车键监听
+				document.getElementById("pdaMac").addEventListener("keydown", function(e) {
+					if (13 == e.keyCode) {
+						document.activeElement.blur(); //隐藏软键盘  
+						getSetting();
+					}
+				}, false);
+				//初始化打印
+				try {
+					var main = plus.android.runtimeMainActivity();
+					var BluetoothAdapter = plus.android.importClass("android.bluetooth.BluetoothAdapter");
+					var UUID = plus.android.importClass("java.util.UUID");
+
+					uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+					var BAdapter = BluetoothAdapter.getDefaultAdapter();
+					BAdapter.cancelDiscovery(); //停止扫描  
+
+					// var addres_mac = plus.storage.getItem("DC:1D:30:3F:D2:50");//传入打印机mac地址  
+					var address_mac = api_localStorageGet("printMac") ? api_localStorageGet("printMac") : "DC:1D:30:3F:D2:50";
+					device = BAdapter.getRemoteDevice(address_mac);
+					plus.android.importClass(device);
+
+					bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+					plus.android.importClass(bluetoothSocket);
+				} catch (err) {
+					// alert(err);
+					console.log(err);
+					mui.alert(err)
+					plus.ui.toast("蓝牙连接异常！");
+				}
+			})
+
+			//获取手机MAC地址和打印信息
+			function getMac() {
+				var pdaMac = api_localStorageGet("pdaMac");
+				var printMac = api_localStorageGet("printMac");
+				$("#pdaMac").val(pdaMac)
+				$("#printMac").val(printMac)
+				return pdaMac;
+			}
+			//获取打印设置信息
+			function getSetting() {
+				if ($("#pdaMac").val().length == 0) {
+					plus.ui.toast("PDA地址不能为空");
+					$("#pdaMac").focus(); //获取焦点
+					return;
+				}
+			}
+			//确定
+			function doSure() {
+				if ($("#pdaMac").val().length == 0) {
+					plus.ui.toast("PDA地址不能为空");
+					$("#pdaMac").focus(); //获取焦点
+					return;
+				}
+				if ($("#printMac").val().length == 0) {
+					plus.ui.toast("打印机地址不能为空");
+					$("#printMac").focus(); //获取焦点
+					return;
+				}
+				//判断是否存在
+				api_localStorageSave("pdaMac", $("#pdaMac").val());
+				api_localStorageSave("printMac", $("#printMac").val());
+				alert("已保存")
+			}
+
+			//打印
+			function doPrint() {
+				//获取打印信息
+				var pdaMac = $("#pdaMac").val();
+				var printMac = $("#printMac").val();
+				//执行打印
+				//console.log(pdaMac + "-0-" + printMac)
+				doPrintTest(pdaMac, printMac);
+			}
+			//执行打印
+			function doPrintTest(pdaMac, printMac) {
+				try {
+					if (!bluetoothSocket.isConnected()) {
+						plus.ui.toast("重新连接");
+						bluetoothSocket.connect();
+					}
+					var outputStream = bluetoothSocket.getOutputStream();
+					plus.android.importClass(outputStream);
+
+					//var barcode = "102000460*N017051601*14*170519*002";
+					var pdaMacStr = "PDA地址:     " + pdaMac;
+					var printMacStr = "打印地址:     " + printMac;
+					var titleName = "测试页";
+
+					//内容
+					var printCmd = "! 0 203 203 510 1 \n\r"; //建立页面 对于203dpi,8点=1mm;对于305dpi,12点=1mm
+					printCmd += "POSTFEED 8\n\r"; //打印之后走纸距离指令
+					printCmd += "PAGE-WIDTH 640 \n\r"; //打印型号 超过不显示
+					//printCmd+="CENTER \n\r";
+					printCmd += "SETMAG 1 1\n\r";
+					printCmd += "SETBOLD 2\n\r";
+					printCmd += "TEXT 24 1 260 4 " + titleName + " \n\r";
+					printCmd += "SETMAG 0 0\n\r";
+					printCmd += "SETBOLD 0\n\r";
+					//printCmd+="LEFT \n\r";	
+					printCmd += "LINE 2 28 2 406 3 \n\r"; //划线
+					printCmd += "LINE 125 28 125 406 3 \n\r";
+					printCmd += "LINE 570 28 570 406 3 \n\r";
+					//
+					printCmd += "LINE 2 28 570 28 3 \n\r";
+					printCmd += "TEXT 24 0 12 70 " + pdaMacStr + " \n\r";
+					printCmd += "LINE 2 210 570 210 3 \n\r";
+					printCmd += "TEXT 24 0 12 250 " + printMacStr + " \n\r";
+					printCmd += "LINE 2 405 570 406 3 \n\r";
+					//打印二维条码
+					// printCmd += "BARCODE QR 92 240 M 2 U 4\r\n"; //打印二维条码 超过不显示BARCODE \n\r  
+					// printCmd += "MA," + barcode + "\r\n";
+					// printCmd += "ENDQR\n\r";
+					// printCmd+="VBARCODE 128 1 0 32 184 344 "+barcode+"\n\r";//打印一维条码  超过不显示         
+					//开始打印     
+					printCmd += "FORM \n\r"; // 型号
+					printCmd += "PRINT \n\r";
+
+					var arrayBuffer = plus.android.invoke(printCmd, 'getBytes', 'gbk'); //stringToByte(printCmd);  
+					outputStream.write(arrayBuffer);
+					outputStream.flush();
+				} catch (err) {
+					// alert(err);
+					console.log(err);
+					mui.alert(err)
+				}
+			}
+			function clear() {
+				$("#printMac").val("");
+			}
+		</script>
+	</body>
+</html>

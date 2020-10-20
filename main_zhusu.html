@@ -1,0 +1,269 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>塑胶车间主页</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="js/mui.min.js"></script>
+		<script src="js/api.js"></script>
+		<script src="js/jquery-1.11.1.js"></script>
+		<script src="js/jquery.xml2json.js.js"></script>
+		<script src="js/template-web.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="./css/comment.css" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav  mui-bar-transparent colorBg">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" id="headtitle">塑胶车间()</h1>
+			<a class="mui-pull-right"><span class="title-right" id="usr"></span></a>
+		</header>
+		<div class="mui-content">
+			<div class="mui-row">
+				<div class="mui-col-sm-2 mui-col-xs-12">
+					<div class="mui-card" style="text-align: center;border-radius:0.3125rem;position:fixed;left:0px; ">
+						<div class="mui-card-header">在线人数</div>
+						<a href="javascript:;" class="aui-palace-grid">
+							<h4 id="ZSonline">50'</h4>
+							<p>注塑人数</p>
+						</a>
+						<a href="javascript:;" class="aui-palace-grid">
+							<h4 id="CYonline">12'</h4>
+							<p>冲压人数</p>
+						</a>
+						<a href="javascript:;" class="aui-palace-grid">
+							<h4 id="SYonline">10'</h4>
+							<p>丝印人数</p>
+						</a>
+					</div>
+					<div class="divHeight"></div>
+				</div>
+				<div class="mui-col-sm-7 mui-col-xs-12">
+					<div id="pullrefresh">
+						<ul class="mui-table-view mui-row" id="list">
+							<script id='ui-template' type="text/template">
+								<% for(var i in record){ var item=record[i]; %>		
+							{{if item.RUNING_STATUS=="运行中"}}
+							<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6 colorDoLeft" data-line='<%=(item.LINE_NO)%>' data-name='<%=(item.LINE_NAME)%>'data-item='<%=(item.ITEM)%>'> 
+							{{else if item.RUNING_STATUS=="计划停机"}}
+							<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6 colorUnLeft" data-line='<%=(item.LINE_NO)%>' data-name='<%=(item.LINE_NAME)%>'data-item='<%=(item.ITEM)%>'> 
+							{{else}}
+							<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6 colorDangerRight" data-line='<%=(item.LINE_NO)%>' data-name='<%=(item.LINE_NAME)%>'data-item='<%=(item.ITEM)%>'> 
+							{{/if}}				
+								<span class="mui-media-object mui-pull-left listCircle">
+									<span class="listCircleWord"><%=(item.LINE_NAME)%></span>
+								</span>							
+								<div class="mui-media-body">
+									<%=(item.ITEM_INFO)%>
+									<p class='mui-ellipsis' style="font-size: 11px;">品名：<%=(item.ITEM_NAME)%></p>
+									{{if item.STOP_QTY>0}}
+									<p style="color: red;font-size: 11px;">未维护停机数：<%=(item.STOP_QTY)%></p>
+									{{else}}
+									<p class='mui-ellipsis' style="font-size: 11px;">未维护停机数：<%=(item.STOP_QTY)%></p>
+									{{/if}}	
+								</div>
+							</li>						
+							<% } %>
+						</script>
+						</ul>
+					</div>
+				</div>
+				<div class="mui-col-sm-3 mui-col-xs-12" style="border-radius:0.3125rem;position:fixed;right:0px;">
+					<div>
+						<ul class="mui-table-view mui-grid-view mui-grid-9" id="btnList">
+							<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+								<div class="inner">
+									<div class="disc">主页</div>
+								</div>
+							</li>
+							<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+								<div class="inner">
+									<div class="disc">返工</div>
+								</div>
+							</li>
+							<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+								<div class="inner">
+									<div class="disc">异常</div>
+								</div>
+							</li>
+							<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+								<div class="inner">
+									<div class="disc">STOP</div>
+								</div>
+							</li>
+						</ul>
+						<ul class="mui-table-view" id="order">
+							<li class="mui-table-view-cell" data-name="产出信息数量">
+								<a class="mui-navigate-right">产出信息数量
+									<span class="mui-badge mui-badge-primary" id="outputinfo">11'</span>
+								</a>
+							</li>
+							<li class="mui-table-view-cell" data-name="停机数量">
+								<a class="mui-navigate-right">停机数量
+									<span class="mui-badge mui-badge-success" id="downinfo">22'</span>
+								</a>
+							</li>
+							<li class="mui-table-view-cell" data-name="设备状态">
+								<a class="mui-navigate-right">设备状态
+									<span class="mui-badge mui-badge-danger" id="deviceinfo">33'</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<nav class="mui-bar mui-bar-tab colorBg">
+			<div class="mui-card-footer nav-word">
+				<span id="slogan"></span>
+			</div>
+		</nav>
+		<script src="js/mui.js"></script>
+		<script type="text/javascript">
+			window.addEventListener('refresh', function(e) { //监听页面返回事件
+				window.location.reload(); //执行刷新
+			});
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: { //下拉刷新
+						auto: true, //可选,默认false.自动下拉刷新一次
+						contentdown: "下拉可以刷新", //可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+						contentover: "释放立即刷新", //可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+						contentrefresh: "正在刷新...", //可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+						callback: pulldownRefresh
+					},
+					up: { //上拉加载
+						//auto:true,//可选,默认false.自动上拉加载一次
+						contentrefresh: '正在加载...',
+						contentnomore: '没有更多数据了', //可选，请求完毕若没有更多数据时显示的提醒内容；
+						callback: pullupRefresh
+					}
+				}
+			});
+			mui.plusReady(function() {
+				byId("usr").innerHTML = setUsrCode();
+				getZS_Info001(); //获取zhusu_main两侧数据
+				ZS_GET_LINE_INFO(1, 2); //获取列表数据
+				byId("slogan").innerHTML = slogan();
+			});
+			
+			mui("#list").on("tap", "li", function() {
+				var lineno = this.getAttribute('data-line'); //线体编号
+				var linename = this.getAttribute('data-name'); //线体名
+				//console.log("lineno:"+lineno+"linename:"+linename+"item:" + item);
+				OpenWindow('zs_line_detail', '/web/zs_line_detail.html', {
+					"lineno": lineno,
+					"linename": linename
+				});
+			})
+
+			mui("#order").on("tap", "li", function() {
+				var line_name = this.getAttribute('data-name');
+				var id = "";
+				var url = ";"
+				if (line_name == "产出信息数量") {
+					id = "zs_line_table";
+					url = "/web/zs_line_table.html";
+				} else if(line_name == "停机数量"){
+					id = "zs_stop_info";
+					url = "/web/zs_stop_info.html";
+				}else if(line_name == "设备状态"){
+					id = "zs_device_info";
+					url = "/web/zs_device_info.html";
+				}
+				OpenWindow(id, url, {
+					"line_name": line_name
+				});
+			});
+
+			var count = 1;
+
+			function pulldownRefresh() {
+				count = 1; //第一页
+				type = 1; //代表下拉刷新
+				ZS_GET_LINE_INFO(count, type); //具体取数据的方法
+			}
+
+			function pullupRefresh() {
+				count++; //翻下一页
+				type = 2; //代表上拉加载
+				ZS_GET_LINE_INFO(count, type); //具体取数据的方法
+			}
+
+			function getZS_Info001() {
+				jQueryWeb("ZS_GET_Info001", "", function(xmlHttpRequest, status) {
+					if (status == 'success') {
+						var json_obj = $.xml2json(xmlHttpRequest.responseXML); //正式启用
+						//console.log(JSON.stringify(json_obj))
+						var data = eval('(' + json_obj + ')'); //string->JSON格式
+						$("#headtitle").text("塑胶车间（" + data[1].当前班次 + "）")
+						$("#ZSonline").text(data[2].VALUE); //注塑人数
+						$("#CYonline").text(data[3].VALUE); //冲压人数
+						$("#SYonline").text(data[4].VALUE); //丝印人数
+						$("#outputinfo").text(data[5].VALUE); //产出信息数量
+						$("#downinfo").text(data[6].VALUE); //停机数量
+						$("#deviceinfo").text(data[7].VALUE);//设备状态
+					} else {
+						mui.alert("ZS_GET_Info001连接失败");
+					}
+				});
+			}
+
+			function ZS_GET_LINE_INFO(page, type) {
+				jQueryWeb("ZS_GET_LINE_INFO", {
+					"page_no": page,
+					"page_row": 16
+				}, function(xmlHttpRequest, status) {
+					if (status == 'success') {
+						var json_obj = $.xml2json(xmlHttpRequest.responseXML);
+						//console.log(JSON.stringify(json_obj))
+						var data = json_obj.diffgram.DocumentElement;
+						//console.log(JSON.stringify(data));
+						//document.getElementById('list').innerHTML = template('ui-template', {
+						//	"record": data.Table
+						//});
+						if (type == 2) { //下拉加载
+							if (data) {
+								var html = '';
+								if (page != 1) {
+									html = document.getElementById("list").innerHTML;
+								}
+								document.getElementById('list').innerHTML = html + template('ui-template', {
+									"record": data.Table
+								});
+							}
+							mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //结束下拉刷新
+							//结束上拉加载，并根据情况切换“下拉显示更多数据”，以及“没有更多数据了”。执行endPullupToRefresh()方法，结束转雪花进度条的“正在加载...”过程,若还有更多数据，则传入false; 否则传入true，之后滚动条滚动到底时
+							if (data) {
+								mui('#pullrefresh').pullRefresh().endPullupToRefresh(false);
+							} else {
+								mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+							}
+						}
+						if (type == 1) { //上拉刷新
+							/*下面这句很关键！*/
+							mui('#pullrefresh').pullRefresh().refresh(true); //有重新触发上拉加载的需求（比如当前类别已无更多数据，但切换到另外一个类别后，应支持继续上拉加载）
+							//vm.companylist = data.company_list;
+							//plus.nativeUI.closeWaiting();//数据渲染完毕，关闭加载框
+							mui.currentWebview.show(); //显示当前页面
+							var html = '';
+							//console.log(page != 1)
+							if (page != 1) {
+								html = document.getElementById("list").innerHTML;
+							}
+							document.getElementById('list').innerHTML = html + template('ui-template', {
+								"record": data.Table
+							});
+						}
+					} else {
+						mui.alert("ZS_GET_LINE_INFO连接失败");
+					}
+				})
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,159 @@
+/* 2020-7-10 */
+.mui-content {
+	margin-top: 2px;
+}
+
+.inner {
+	position: relative;
+	width: 4.375rem;
+	height: 4.375rem;
+	border-radius: 150px;
+	background: linear-gradient(to top, silver, whitesmoke);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.inner .disc {
+	position: absolute;
+	width: 80%;
+	height: 80%;
+	border-radius: 50%;
+	line-height: 3.5rem;
+	color: black;
+	background: linear-gradient(silver, whitesmoke);
+}
+
+.colorBg {
+	background: -moz-linear-gradient(top, #34dbfc 0%, #61a7fd 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1fd5e6), color-stop(100%, #21b6f8));
+	background: -webkit-linear-gradient(top, #34dbfc 0%, #61a7fd 100%);
+	background: -o-linear-gradient(top, #34dbfc 0%, #61a7fd 100%);
+	background: -ms-linear-gradient(top, #34dbfc 0%, #61a7fd 100%);
+	background: linear-gradient(to bottom, #34dbfc 0%, #61a7fd 100%);
+}
+
+.colorDoLeft {
+	border-radius: 0.625rem;
+	background: #90EE90;
+}
+
+.colorDoRight {
+	border-radius: 0.625rem;
+	background: #90EE90;
+}
+
+.colorUnLeft {
+	border-radius: 0.625rem;
+	background: #D3D3D3;
+}
+
+.colorUnRight {
+	border-radius: 0.625rem;
+	background: -moz-linear-gradient(left, #A9A9A9 0%, #D3D3D3 100%);
+	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #A9A9A9), color-stop(100%, #D3D3D3));
+	background: -webkit-linear-gradient(left, #A9A9A9 0%, #D3D3D3 100%);
+	background: -o-linear-gradient(left, #A9A9A9 0%, #D3D3D3 100%);
+	background: -ms-linear-gradient(left, #A9A9A9 0%, #D3D3D3 100%);
+	background: linear-gradient(to right, #A9A9A9 0%, #D3D3D3 100%);
+}
+
+.colorDangerLeft {
+	border-radius: 0.625rem;
+	background: -moz-linear-gradient(left, #FFA07A 0%, #FF6666 100%);
+	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #FFA07A), color-stop(100%, #FF6347));
+	background: -webkit-linear-gradient(left, #FFA07A 0%, #FF6666 100%);
+	background: -o-linear-gradient(left, #FFA07A 0%, #FF6666 100%);
+	background: -ms-linear-gradient(left, #FFA07A 0%, #FF6666 100%);
+	background: linear-gradient(to right, #FFA07A 0%, #FF6666 100%);
+}
+
+.colorDangerRight {
+	border-radius: 0.625rem;
+	background: #FFA07A;
+}
+
+.table {
+	border: 1px solid #0e94ea;
+	border-top: none;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.table th {
+	background-repeat: repeat-x;
+	/* height: 30px; */
+}
+
+.table td,
+.table th {
+	border: 1px solid #cad9ea;
+	padding: 0 1em 0;
+}
+
+.table tr.alter {
+	background-color: #f5fafe;
+}
+
+.table tr {
+	border-top: 1px solid #0e94ea;
+	background: rgba(14, 148, 234, 0.1);
+}
+
+.table thead tr {
+	background: rgba(14, 148, 234, 0.4);
+}
+
+.table tr.bg-color {
+	background: rgba(14, 148, 234, 0.2);
+}
+
+.nav-word {
+	display: flex;
+	justify-content: center;
+}
+/*header 用户名居于右侧*/
+.title-right {
+	float: right;
+	line-height: 44px !important;
+}
+
+/* SMT 和 注塑 主页样式 */
+.aui-palace-grid {
+	position: relative;
+	width: 100%;
+	box-sizing: border-box;
+	text-align: center;
+	background-color: white;
+}
+
+.aui-palace-grid span {
+	color: #22bbf4;
+}
+
+.divHeight {
+	width: 100%;
+	height: 10px;
+	background: #f5f5f5;
+	position: relative;
+	overflow: hidden;
+}
+
+.listCircle {
+	border-radius: 50%;
+	height: 2.5rem;
+	width: 2.5rem;
+	display: inline-block;
+	background: #FFCC00;
+	vertical-align: top;
+}
+
+.listCircleWord {
+	display: block;
+	color: #FFFFFF;
+	height: 2.5rem;
+	line-height: 2.5rem;
+	text-align: center;
+}
+
+/* SMT 和 注塑 主页样式 */

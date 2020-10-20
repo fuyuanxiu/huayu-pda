@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>SMT车间主页</title>
+		<script src="js/mui.min.js"></script>
+		<script src="js/api.js"></script>
+		<script src="js/jquery-1.11.1.js"></script>
+		<script src="js/jquery.xml2json.js.js"></script>
+		<script src="js/template-web.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="./css/comment.css" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav  mui-bar-transparent colorBg">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">SMT车间(白班)</h1>
+			<a class="mui-pull-right"><span class="title-right" id="usr"></span></a>
+		</header>
+		<div class="mui-content">
+			<div class="mui-row">
+				<div class="mui-col-sm-2 mui-col-xs-12">
+					<div class="mui-card" style="text-align: center;border-radius:0.3125rem;">
+						<div class="mui-card-header">在线人数</div>
+						<a href="javascript:;" class="aui-palace-grid">
+							<h4 id="SMTonline">50'</h4>
+							<p>SMT人数</p>
+						</a>
+						<a href="javascript:;" class="aui-palace-grid">
+							<h4 id="shaolu">12'</h4>
+							<p>烧录组</p>
+						</a>
+						<a href="javascript:;" class="aui-palace-grid">
+							<h4 id="guotie">10'</h4>
+							<p>锅贴仔</p>
+						</a>
+					</div>
+					<div class="divHeight"></div>
+				</div>
+				<div class="mui-col-sm-7 mui-col-xs-12">
+					<ul class="mui-table-view mui-row" id="list">
+						<script id='ui-template' type="text/template">
+							<% for(var i in record){ var item=record[i]; %>		
+							{{if item.RUNING_STATUS=="运行中"}}
+							<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6 colorDoLeft" data-line='<%=(item.LINE_NO)%>' data-name='<%=(item.LINE_NAME)%>'data-item='<%=(item.ITEM)%>'> 
+							{{else if item.RUNING_STATUS=="计划停机"}}
+							<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6 colorUnLeft" data-line='<%=(item.LINE_NO)%>' data-name='<%=(item.LINE_NAME)%>'data-item='<%=(item.ITEM)%>'> 
+							{{else}}
+							<li class="mui-table-view-cell mui-media mui-col-sm-6 mui-col-xs-6 colorDangerRight" data-line='<%=(item.LINE_NO)%>' data-name='<%=(item.LINE_NAME)%>'data-item='<%=(item.ITEM)%>'> 
+							{{/if}}				
+								<span class="mui-media-object mui-pull-left listCircle">
+									<span class="listCircleWord"><%=(item.LINE_NAME)%></span>
+								</span>							
+								<div class="mui-media-body">
+									<%=(item.ITEM)%> (<%=(item.PROC)%>)		
+									<p class='mui-ellipsis' style="font-size: 11px;">品名：<%=(item.ITEM_NAME)%></p>
+									{{if item.STOP_QTY>0}}
+									<p style="color: red;font-size: 11px;">未维护停机数：<%=(item.STOP_QTY)%></p>
+									{{else}}
+									<p class='mui-ellipsis' style="font-size: 11px;">未维护停机数：<%=(item.STOP_QTY)%></p>
+									{{/if}}	
+								</div>
+							</li>						
+							<% } %>
+						</script>
+					</ul>
+				</div>
+				<div class="mui-col-sm-3 mui-col-xs-12">
+					<ul class="mui-table-view mui-grid-view mui-grid-9" id="btnList">
+						<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+							<div class="inner">
+								<div class="disc">主页</div>
+							</div>
+						</li>
+						<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+							<div class="inner">
+								<div class="disc">返工</div>
+							</div>
+						</li>
+						<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+							<div class="inner">
+								<div class="disc">异常</div>
+							</div>
+						</li>
+						<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-6 bg1">
+							<div class="inner">
+								<div class="disc">STOP</div>
+							</div>
+						</li>
+					</ul>
+					<ul class="mui-table-view" id="order">
+						<li class="mui-table-view-cell" data-name="产出信息数量">
+							<a class="mui-navigate-right">产出信息数量
+								<span class="mui-badge mui-badge-primary" id="outputinfo">11'</span>
+							</a>
+						</li>
+						<li class="mui-table-view-cell" data-name="停机信息">
+							<a class="mui-navigate-right">停机数量
+								<span class="mui-badge mui-badge-success" id="downinfo">22'</span>
+							</a>
+						</li>
+						<li class="mui-table-view-cell" data-name="采集状态">
+							<a class="mui-navigate-right">采集状态
+								<span class="mui-badge mui-badge-danger" id="collectioninfo">33'</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<nav class="mui-bar mui-bar-tab colorBg">
+			<div class="mui-card-footer nav-word">
+				<span id="slogan"></span>
+			</div>
+		</nav>
+		<script type="text/javascript" charset="utf-8">
+			window.addEventListener('refresh', function(e) { //监听页面返回事件
+				window.location.reload(); //执行刷新
+			});
+			// var timeOut=mui.later(function() {//定时刷新
+			// 	window.location.reload(); //执行刷新
+			// }, 18000);//三分钟刷新一次 180000
+			mui.plusReady(function() {
+				byId("usr").innerHTML = setUsrCode();
+				getSMTInfoData(); //获取SMT_main两侧数据
+				getSMTLineInfoData(); //获取列表数据
+				byId("slogan").innerHTML = slogan();
+			})
+
+			mui("#list").on("tap", "li", function() {
+				var lineno = this.getAttribute('data-line'); //线体编号
+				var linename = this.getAttribute('data-name'); //线体名
+				var item = this.getAttribute('data-item'); //当前工单
+				//console.log("lineno:"+lineno+"linename:"+linename+"item:" + item);
+				OpenWindow('line_detail', '/web/line_detail.html', {
+					"lineno": lineno,
+					"linename": linename,
+					"item": item
+				});
+			})
+
+			mui("#order").on("tap", "li", function() {
+				var line_name = this.getAttribute('data-name');
+				var id = "";
+				var url = ";"
+				if (line_name == "产出信息数量") {
+					id = "line_table";
+					url = "/web/line_table.html";
+				} else if (line_name == "停机信息") {
+					id = "stop_info";
+					url = "/web/stop_info.html"
+				} else {
+					id = "collection_info";
+					url = "/web/smt_collection_info.html"
+				}
+				OpenWindow(id, url, {
+					"line_name": line_name
+				});
+			});
+
+			function getSMTInfoData() { //获取两侧数据
+				jQueryWeb("SMT_GET_Info001", "",
+					function(xmlHttpRequest, status) {
+						if (status == 'success') {
+							var json_obj = $.xml2json(xmlHttpRequest.responseXML); //正式启用
+							var data = eval('(' + json_obj + ')'); //string->JSON格式
+							$("#SMTonline").text(data[1].QTY); //SMT人数
+							$("#shaolu").text(data[2].QTY); //烧录组
+							$("#guotie").text(data[3].QTY); //锅贴仔
+							$("#downinfo").text(data[4].QTY); //停机数量
+							$("#outputinfo").text(data[5].QTY); //产出信息数量
+							$("#collectioninfo").text(data[6].QTY); //采集状态
+						} else {
+							mui.alert("SMT_GET_Info001连接失败");
+						}
+					});
+			}
+
+			function getSMTLineInfoData() { //获取机台列表数据
+				jQueryWeb("SMT_GET_LINE_INFO", "", function(xmlHttpRequest, status) {
+					if (status == 'success') {
+						var json_obj = $.xml2json(xmlHttpRequest.responseXML);
+						//console.log(JSON.stringify(json_obj))
+						var data = json_obj.diffgram.NewDataSet;
+						//console.log(JSON.stringify(data));
+						document.getElementById('list').innerHTML = template('ui-template', {
+							"record": data.Table
+						});
+					} else {
+						mui.alert("SMT_GET_LINE_INFO连接失败");
+						return false;
+					}
+				});
+			}
+		</script>
+	</body>
+</html>
