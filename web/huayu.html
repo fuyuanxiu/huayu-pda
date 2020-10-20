@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>品质检验</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/api.js"></script>
+		<script src="../js/template-web.js"></script>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/jquery-1.11.1.js"></script>
+		<script src="../js/jquery.xml2json.js.js"></script>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="../css/comment.css" />
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">品质检验</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group" id="formId">
+				<div class="mui-input-row ">
+					<label>检验节点</label>
+					<a class="mui-navigate-right">
+						<span class="mui-badge1">
+							<select class="mui-h5" style="margin:auto; color:#000;" id="selectPoint">
+								<option value="">请选择</option>
+								<option value="FQC">FQC</option>
+								<option value="BBQ">BBQ</option>
+							</select>
+						</span>
+					</a>
+				</div>
+				<div class="mui-input-row">
+					<label onclick="clicked('commom/saomiao.html','boxCode','web/huayu.html');">箱号条码</label>
+					<input id="boxCode" placeholder="请扫描" type="text" class="mui-input-clear">
+				</div>
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell mui-collapse">
+						<a class="mui-navigate-right" href="#">条码信息</a>
+						<div class="mui-collapse-content">
+							<p>客户简称:&nbsp; <span id="cust_s"></span></p>
+							<p>机型:&nbsp;<span id="devType"></span></p>
+							<p>组长:&nbsp;<span id="liner"></span></p>
+							<p>不良率:&nbsp;<span id="badPer"></span></p>
+						</div>
+					</li>
+				</ul>
+				<div class="mui-input-row">
+					<label>抽检总量(PCS)</label>
+					<input id="checkTot" placeholder="请扫描" type="text" value="3000" class="mui-input-clear">
+				</div>
+				<div class="mui-input-row">
+					<label>不良总量(PCS)</label>
+					<input id="badTot" placeholder="请扫描" type="text" value="20" class="mui-input-clear">
+				</div>
+				<div class="mui-input-row">
+					<label>检验结果</label>
+					<span class="radio_inline mui-radio">
+						<input name="radio1" type="radio" id="B" value="合格" checked>
+						<label for="合格">合格</label>
+						<input name="radio1" type="radio" id="不合格" value="不合格">
+						<label for="不合格">不合格</label>
+					</span>
+				</div>
+				<div class="mui-input-row">
+					<label>责任部门</label>
+					<a class="mui-navigate-right">
+						<span class="mui-badge1">
+							<select class="mui-h5" style="margin:auto; color:#000;" id="selectDepart">
+								<option value="">请选择</option>
+								<option value="部门A">部门A</option>
+								<option value="部门B">部门B</option>
+							</select>
+						</span>
+					</a>
+				</div>
+				<div class="mui-input-row">
+					<label>不良内容</label>
+					<a class="mui-navigate-right">
+						<span class="mui-badge1">
+							<select class="mui-h5" style="margin:auto; color:#000;" id="badContent" multiple>
+								<option disabled value="">请选择</option>
+								<option value="脱线">脱线</option>
+								<option value="脱胶">脱胶</option>
+								<option value="起翘">起翘</option>
+								<option value="翘起">翘起</option>
+							</select>
+						</span>
+					</a>
+				</div>
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell">箱号条码
+						<span class="mui-badge mui-badge-success">数量</span>
+					</li>
+					<li class="mui-table-view-cell">BARCODE00000001
+						<span class="mui-badge mui-badge-primary">11</span>
+					</li>
+					<li class="mui-table-view-cell">BARCODE00000001
+						<span class="mui-badge mui-badge-primary">22</span>
+					</li>
+					<li class="mui-table-view-cell">BARCODE00000001
+						<span class="mui-badge mui-badge-primary">33</span>
+					</li>
+				</ul>
+			</form>
+			<div class="mui-content-padded" align="center">
+				<button type="button" class="mui-btn mui-btn-green" data-loading-icon="mui-spinner mui-spinner-custom" id="save">保存数据</button>
+				<button style="margin-top: 0.625rem;" type="button" class="mui-btn mui-btn-warning" id="clear">清除数据</button>
+			</div>
+		</div>
+	</body>
+	<script>
+		mui.init();
+
+		$("#badContent").change(function() {
+			var bad=$("#badContent").val()
+			console.log(bad)
+		})
+
+		function clicked(url, f1, urlId) {
+			OpenWindow(f1, url, {
+				urlId: urlId,
+				inputId: f1
+			});
+		};
+	</script>
+</html>
