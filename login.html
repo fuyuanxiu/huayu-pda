@@ -49,9 +49,7 @@
 			</form>
 			<!-- 注意：登录按钮不能和账号密码输入框放在一个form里面 -->
 			<div class="mui-content-padded" align="center">
-				<button style="width: 100%;" type="button" class="mui-btn mui-btn-blue" id="login">内网登陆</button>
-				<button style="width: 100%;margin-top:10px;display: none;" type="button" class="mui-btn mui-btn-green" id="loginWai">外网登录</button>
-				<!-- <button style="width: 100%;margin-top:10px;" type="button" class="mui-btn mui-btn-green" id="loginWai">外网登录</button> -->
+				<button style="width: 100%;" type="button" class="mui-btn mui-btn-blue" id="login">登陆</button>
 			</div>
 			<div id="loadDiv" class="mui-popover mui-popover-action mui-popover-bottom" data-disable-auto-close="true">
 				<canvas id="canvas" width="500" height="500"></canvas>
@@ -82,8 +80,9 @@
 					}
 				});
 			}
+			
 			mui.plusReady(function() {
-				getPrintInfo();
+				//getPrintInfo();
 				//20191113-fyx-默认填写上一次登录人账号
 				document.getElementById("username").value = api_localStorageGet("code")
 				plus.runtime.getProperty(plus.runtime.appid, function(inf) {
@@ -91,7 +90,6 @@
 				})
 
 				var login = document.getElementById("login");
-				var loginWai = document.getElementById("loginWai");
 
 				login.addEventListener('tap', function() {
 					var username = document.getElementById("username");
@@ -104,38 +102,20 @@
 						plus.ui.toast("密码不能为空");
 						return;
 					}
-					//api_localStorageSave("code", username.value);
+					api_localStorageSave("code", username.value);
 					api_localStorageSave("webPath", API.webPath);
-					update('nei');
-					//doLogin();
+					//update('nei');
+					doLogin();
 				});
-				loginWai.addEventListener('tap', function() {
-					var username = document.getElementById("username");
-					var password = document.getElementById("password");
-					if (username.value.length == 0) {
-						plus.ui.toast("用户名不能为空");
-						return;
-					}
-					if (password.value.length == 0) {
-						plus.ui.toast("密码不能为空");
-						return;
-					}
-					//api_localStorageSave("code", username.value);
-					api_localStorageSave("webPath", API.webPathWai);
-					//doLogin();
-					update('wai');
-				})
-
-
 			})
-
+			/* 
 			function update(net) {
 				plus.runtime.getProperty(plus.runtime.appid, function(inf) {
 					ver = inf.version;
 					jQueryWeb("PdaCheckVersion", {}, function(xmlHttpRequest, status) {
 						if (status == 'success') {
-							var json_obj = $.xml2json(xmlHttpRequest.responseXML);
-							var data = json_obj.diffgram.NewDataSet.Table
+							//var json_obj = $.xml2json(xmlHttpRequest.responseXML);
+							//var data = json_obj.diffgram.NewDataSet.Table
 
 							if (data.VERSION > ver) {
 								//console.log('1111')
@@ -154,51 +134,62 @@
 					})
 				});
 
-			}
-			//监听用户名输入框
-			$('#username').bind('keyup', function(event) {
-				if (event.keyCode == "13") { //输入回车执行
-					var username = document.getElementById("username").value;
-					if (username == "cyadmin123") {
-						document.getElementById("loginWai").style.display = "block";
-					}
-				}
-			});
+			}*/
 
 			function doLogin() {
 				var username = document.getElementById("username");
 				var password = document.getElementById("password");
 				mui('#login').button('loading');
-				mui('#loginWai').button('loading');
-				jQueryWeb("VertifyUser", {
-					"UserId": username.value,
-					"PassWord": password.value
-				}, function(xmlHttpRequest, status) {
-					if (status == 'success') {
-						var json_obj = $.xml2json(xmlHttpRequest.responseXML);
-						var data = json_obj.diffgram.DocumentElement;
-						//console.log(JSON.stringify(json_obj))
-						if (data.table01.result == "true") {
+				
+				mui.ajax(API.webPath + 'login', {
+					data: {
+						username: username.value.toString(),
+						password: password.value.toString()
+					},
+					dataType: 'json',
+					type: 'POST',
+					timeout: 10000,
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					success: function(data) {
+						document.getElementById("password").value = "";
+						console.log(JSON.stringify(data))
+						if (data.result) {
+							//登录成功
 							plus.ui.toast("登录成功");
-							api_localStorageSave("code", username.value);
-							api_localStorageSave("name", data.table01.user_name);
+							api_localStorageSave("code", data.data.ID);
+							api_localStorageSave("name", data.data.USER_CODE);
+							api_localStorageSave("factory", data.data.FACTORY);
+							api_localStorageSave("company", data.data.COMPANY);
+				
+							api_localStorageSave("webPath", API.webPath);
+				
+							//sessionStorage.setItem("bsCode", data.data.FCODE); //存一个session会话
 							mui.openWindow({
 								url: 'main.html',
 								id: 'main',
 							})
+				
 						} else {
-							plus.ui.toast(data.table01.msg);
+							//登录失败
+							plus.ui.toast(data.msg);
+							console.log(data.msg)
 						}
-					} else {
-						mui.alert("登录验证连接超时");
+					},
+					error: function(xhr, type, errorThrown) {
+						plus.ui.toast('登录失败!失败类型是:' + type);
+						console.log(type)
 					}
 				})
+				
 				setTimeout(function() {
 					mui('#login').button('reset');
-					mui('#loginWai').button('reset');
 				}.bind(this), 1000);
 			}
-
+			
+		   
+/*
 			//下载文件
 			function dowload(url) {
 				var options = {
@@ -243,6 +234,8 @@
 
 				dtask.start();
 			}
+			*/
+		   /*
 			var speed = 0.1;
 
 			function showPer(baifenbi, aln) {
@@ -304,8 +297,8 @@
 				// }());
 				//if (speed > 100) return;
 				speed += 0.2;
-			}
-
+			}*/
+/*
 			//获取打印信息
 			function getPrintInfo() {
 				var mac = "";
@@ -325,6 +318,7 @@
 					api_localStorageSave("pdaMac", mac);
 				}
 			}
+			
 			//安卓6.0以上版本获取Mac地址
 			function getMacNew() {
 				var str = "";
@@ -353,7 +347,7 @@
 					str = "02:00:00:00:00:00";
 				}
 				return str;
-			}
+			}*/
 		</script>
 	</body>
 </html>

@@ -27,15 +27,12 @@
 					<a class="mui-navigate-right">
 						<span class="mui-badge1">
 							<select class="mui-h5" style="margin:auto; color:#000;" id="selectPoint">
-								<option value="">请选择</option>
-								<option value="FQC">FQC</option>
-								<option value="BBQ">BBQ</option>
 							</select>
 						</span>
 					</a>
 				</div>
 				<div class="mui-input-row">
-					<label onclick="clicked('commom/saomiao.html','boxCode','web/huayu.html');">箱号条码</label>
+					<label onclick="clicked('commom/saomiao.html','boxCode','web/qual_inspect.html');">箱号条码</label>
 					<input id="boxCode" placeholder="请扫描" type="text" class="mui-input-clear">
 				</div>
 				<ul class="mui-table-view">
@@ -115,11 +112,41 @@
 	</body>
 	<script>
 		mui.init();
-
+		mui.plusReady(function() {
+			getProcList(); //获取检验节点列表
+		})
 		$("#badContent").change(function() {
-			var bad=$("#badContent").val()
+			var bad = $("#badContent").val()
 			console.log(bad)
 		})
+
+		function getProcList() {//获取检验节点列表
+			aj.post('produce/inspect/getProcList', {
+				company: api_localStorageGet("company"),
+				factory: api_localStorageGet("factory"),
+				keyword: ""
+			}, function(data) {
+				//console.log(JSON.stringify(data))
+				if (data.result) {
+					var list=data.data;
+					for(var i=0;i<list.length;i++){
+						if(i==0){
+							$("#selectPoint").append("<option value=''>请选择检验节点</option>");
+						}
+						$("#selectPoint").append("<option value=" + list[i].PROC_NO + ">" + list[i].PROC_NAME + "</option>");
+					}
+				} else {
+					mui.alert(data.msg)
+				}
+			})
+		}
+		
+		$("#boxCode").bind('keyup',function(event){
+			if (event.keyCode == "13") { //输入回车执行
+			
+			}
+		})
+		
 
 		function clicked(url, f1, urlId) {
 			OpenWindow(f1, url, {
