@@ -36,7 +36,7 @@
 					<input id="boxCode" placeholder="请扫描" type="text" class="mui-input-clear">
 				</div>
 				<ul class="mui-table-view">
-					<li class="mui-table-view-cell mui-collapse">
+					<li class="mui-table-view-cell mui-collapse mui-active">
 						<a class="mui-navigate-right" href="#">条码信息</a>
 						<div class="mui-collapse-content">
 							<p>客户简称:&nbsp; <span id="cust_s"></span></p>
@@ -48,19 +48,19 @@
 				</ul>
 				<div class="mui-input-row">
 					<label>抽检总量(PCS)</label>
-					<input id="checkTot" placeholder="请扫描" type="text" value="3000" class="mui-input-clear">
+					<input id="checkTot" placeholder="请输入抽检总量(PCS)" type="text" class="mui-input-clear">
 				</div>
 				<div class="mui-input-row">
 					<label>不良总量(PCS)</label>
-					<input id="badTot" placeholder="请扫描" type="text" value="20" class="mui-input-clear">
+					<input id="badTot" placeholder="请输入不良总量(PCS)" type="text" class="mui-input-clear">
 				</div>
 				<div class="mui-input-row">
 					<label>检验结果</label>
 					<span class="radio_inline mui-radio">
-						<input name="radio1" type="radio" id="B" value="合格" checked>
-						<label for="合格">合格</label>
-						<input name="radio1" type="radio" id="不合格" value="不合格">
-						<label for="不合格">不合格</label>
+						<input name="radio1" type="radio" id="A" value="A" checked>
+						<label for="A">合格</label>
+						<input name="radio1" type="radio" id="B" value="A">
+						<label for="B">不合格</label>
 					</span>
 				</div>
 				<div class="mui-input-row">
@@ -68,9 +68,7 @@
 					<a class="mui-navigate-right">
 						<span class="mui-badge1">
 							<select class="mui-h5" style="margin:auto; color:#000;" id="selectDepart">
-								<option value="">请选择</option>
-								<option value="部门A">部门A</option>
-								<option value="部门B">部门B</option>
+
 							</select>
 						</span>
 					</a>
@@ -80,47 +78,40 @@
 					<a class="mui-navigate-right">
 						<span class="mui-badge1">
 							<select class="mui-h5" style="margin:auto; color:#000;" id="badContent" multiple>
-								<option disabled value="">请选择</option>
-								<option value="脱线">脱线</option>
-								<option value="脱胶">脱胶</option>
-								<option value="起翘">起翘</option>
-								<option value="翘起">翘起</option>
 							</select>
 						</span>
 					</a>
 				</div>
-				<ul class="mui-table-view">
-					<li class="mui-table-view-cell">箱号条码
-						<span class="mui-badge mui-badge-success">数量</span>
-					</li>
-					<li class="mui-table-view-cell">BARCODE00000001
-						<span class="mui-badge mui-badge-primary">11</span>
-					</li>
-					<li class="mui-table-view-cell">BARCODE00000001
-						<span class="mui-badge mui-badge-primary">22</span>
-					</li>
-					<li class="mui-table-view-cell">BARCODE00000001
-						<span class="mui-badge mui-badge-primary">33</span>
-					</li>
+				<ul class="mui-table-view" id="barcodeId">
 				</ul>
+				<script id='template' type="text/template">
+					<% for(var i in record){ var item=record[i];%>
+					<li class="mui-table-view-cell"><%=(item.boxCode)%>
+						<span class="mui-badge mui-badge-success"><%=(item.qty)%></span>
+					</li>
+					<%}%>
+				</script>
 			</form>
 			<div class="mui-content-padded" align="center">
-				<button type="button" class="mui-btn mui-btn-green" data-loading-icon="mui-spinner mui-spinner-custom" id="save">保存数据</button>
-				<button style="margin-top: 0.625rem;" type="button" class="mui-btn mui-btn-warning" id="clear">清除数据</button>
+				<button type="button" class="mui-btn mui-btn-green" data-loading-icon="mui-spinner mui-spinner-custom" id="saveData">保存数据</button>
+				<button style="margin-top: 0.625rem;" type="button" class="mui-btn mui-btn-warning" id="clearData">清除数据</button>
 			</div>
 		</div>
 	</body>
 	<script>
 		mui.init();
+		var barcodeList = [];
 		mui.plusReady(function() {
 			getProcList(); //获取检验节点列表
+			getDepartList(); //获取责任部门列表、
+			getBadList(); //获取不良内容列表
 		})
 		$("#badContent").change(function() {
 			var bad = $("#badContent").val()
 			console.log(bad)
 		})
 
-		function getProcList() {//获取检验节点列表
+		function getProcList() { //获取检验节点列表
 			aj.post('produce/inspect/getProcList', {
 				company: api_localStorageGet("company"),
 				factory: api_localStorageGet("factory"),
@@ -128,9 +119,9 @@
 			}, function(data) {
 				//console.log(JSON.stringify(data))
 				if (data.result) {
-					var list=data.data;
-					for(var i=0;i<list.length;i++){
-						if(i==0){
+					var list = data.data;
+					for (var i = 0; i < list.length; i++) {
+						if (i == 0) {
 							$("#selectPoint").append("<option value=''>请选择检验节点</option>");
 						}
 						$("#selectPoint").append("<option value=" + list[i].PROC_NO + ">" + list[i].PROC_NAME + "</option>");
@@ -140,13 +131,168 @@
 				}
 			})
 		}
-		
-		$("#boxCode").bind('keyup',function(event){
+
+		$("#boxCode").bind('keyup', function(event) {
 			if (event.keyCode == "13") { //输入回车执行
-			
+				if ($("#selectPoint").val() != "" && $("#boxCode").val() != "") {
+					aj.post('produce/inspect/scanBarcode', {
+						company: api_localStorageGet("company"),
+						factory: api_localStorageGet("factory"),
+						user_id: api_localStorageGet("code"),
+						proc: $("#selectPoint").val(),
+						barcode: $("#boxCode").val()
+					}, function(data) {
+						console.log(JSON.stringify(data))
+						if (data.result) {
+							var list = data.data;
+							$("#cust_s").text(list[0].CUST_NAME_S);
+							$("#devType").text(list[0].ITEM_MODEL);
+							$("#liner").text(list[0].LINER_NAME);
+							$("#badPer").text("");
+							if (barcodeList.length == 0) {
+								var arr = {};
+								arr["boxCode"] = "箱号条码";
+								arr["qty"] = "数量";
+								barcodeList.push(arr);
+							}
+							var arr = {};
+							arr["boxCode"] = $("#boxCode").val();
+							arr["qty"] = list[0].QTY;
+							if (barcodeList.length >= 11) {
+								mui.alert("一次最多提交10个箱条码")
+								return false;
+							}
+							barcodeList.push(arr);
+							document.getElementById('barcodeId').innerHTML = template('template', {
+								"record": barcodeList
+							});
+						} else {
+							$("#boxCode").val("");
+							mui.alert(data.msg)
+						}
+					})
+				} else {
+					mui.alert("请先完善数据")
+				}
 			}
 		})
-		
+
+		function getDepartList() {
+			aj.post('produce/inspect/getDepatrList', {
+				company: api_localStorageGet("company"),
+				factory: api_localStorageGet("factory"),
+				keyword: ""
+			}, function(data) {
+				//console.log(JSON.stringify(data))
+				if (data.result) {
+					var list = data.data;
+					for (var i = 0; i < list.length; i++) {
+						if (i == 0) {
+							$("#selectDepart").append("<option value=''>请选择责任部门</option>");
+						}
+						$("#selectDepart").append("<option value=" + list[i].ID + ">" + list[i].ORG_NAME + "</option>");
+					}
+				} else {
+					mui.alert(data.msg)
+				}
+			})
+		}
+
+		function getBadList() {
+			aj.post('produce/inspect/getBadList', {
+				company: api_localStorageGet("company"),
+				factory: api_localStorageGet("factory"),
+				keyword: ""
+			}, function(data) {
+				//console.log(JSON.stringify(data))
+				if (data.result) {
+					var list = data.data;
+					for (var i = 0; i < list.length; i++) {
+						// if (i == 0) {
+						// 	$("#badContent").append("<option disabled value=''>请选择不良内容</option>");
+						// }
+						$("#badContent").append("<option value=" + list[i].DEFECT_CODE + ">" + list[i].DEFECT_NAME + "</option>");
+					}
+				} else {
+					mui.alert(data.msg)
+				}
+			})
+		}
+		$("#saveData").click(function() {
+			var proc = $("#selectPoint").val();
+			var chkTotal = $("#checkTot").val();
+			var badTotal = $("#badTot").val();
+			var chkResult = $('input[name="radio1"]:checked').val();
+			if (chkResult == "A") {
+				chkResult = "合格"
+			} else {
+				chkResult = "不合格"
+			}
+			var depart = $("#selectDepart").val();
+			var badContent = $("#badContent").val();
+
+			if (proc == "" || chkTotal == "" || badTotal == "" || depart == "" || barcodeList.length == 0) {
+				mui.alert("请完善数据")
+				return false;
+			}
+			var codeList = "";
+			for (var i = 1; i < barcodeList.length; i++) {
+				codeList += barcodeList[i].boxCode + ","
+			}
+			var badList="";
+			for (var i = 0; i < badContent.length; i++) {
+				badList += badContent[i] + ","
+			}
+			badList = badList.substring(0, badList.length - 1);
+			codeList = codeList.substring(0, codeList.length - 1);
+			//console.log(proc+"/"+ chkTotal+"/"+ badTotal+"/"+ chkResult+"/"+depart+"/"+badContent+"/"+codeList)
+			saveChkData(proc, chkTotal, badTotal, chkResult, depart, badList, codeList);
+		})
+
+		function saveChkData(proc, chkTotal, badTotal, chkResult, depart, badList, codeList) {
+			aj.post('produce/inspect/saveData', {
+				company: api_localStorageGet("company"),
+				factory: api_localStorageGet("factory"),
+				user_id: api_localStorageGet("code"),
+				proc:proc,
+				barcodeList:codeList,
+				checkTotal:chkTotal,
+				badTotal:badTotal,
+				chkResult:chkResult,
+				departCode:depart,
+				badList: badList
+			}, function(data) {
+				console.log(JSON.stringify(data))
+				if (data.result) {
+					mui.alert("数据保存成功")
+				} else {
+					mui.alert(data.msg)
+				}
+			})
+		}
+
+		$("#clearData").click(function() {
+			toClean();
+		})
+
+		function toClean() {
+			$("#selectPoint").val("");
+			$("#boxCode").val("");
+			$("#cust_s").text("");
+			$("#devType").text("");
+			$("#liner").text("");
+			$("#badPer").text("");
+			$("#checkTot").val("");
+			$("#badTot").val("")
+			barcodeList = [];
+			document.getElementById('barcodeId').innerHTML = template('template', {
+				"record": barcodeList
+			});
+			$("#selectDepart").val("");
+			$("#badContent").val(null);
+			//-----无法重置到合格项
+			$("input[name='radio1'][value=A]").attr("checked", true);
+		}
 
 		function clicked(url, f1, urlId) {
 			OpenWindow(f1, url, {

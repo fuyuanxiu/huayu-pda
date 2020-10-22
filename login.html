@@ -84,7 +84,7 @@
 			mui.plusReady(function() {
 				//getPrintInfo();
 				//20191113-fyx-默认填写上一次登录人账号
-				document.getElementById("username").value = api_localStorageGet("code")
+				document.getElementById("username").value = api_localStorageGet("name")
 				plus.runtime.getProperty(plus.runtime.appid, function(inf) {
 					document.getElementById("ver").innerHTML = "当前版本号：" + inf.version
 				})

@@ -214,13 +214,13 @@ function api_localStorageSave(objname, obj) {
 	var str = JSON.stringify(obj);
 	//存入 
 	localStorage.setItem(objname, str)
-	console.log(JSON.stringify(localStorage))
+//	console.log(JSON.stringify(localStorage))
 	sessionStorage.objname = str;
 }
 
 function api_localStorageGet(objname) {
 	//读取 
-	console.log(JSON.stringify(localStorage))
+//	console.log(JSON.stringify(localStorage))
 	str = localStorage.getItem(objname);
 	//重新转换为对象 
 	//console.log(objname)
