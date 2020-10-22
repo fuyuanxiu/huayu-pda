@@ -36,7 +36,7 @@
 					<input id="boxCode" placeholder="请扫描" type="text" class="mui-input-clear">
 				</div>
 				<ul class="mui-table-view">
-					<li class="mui-table-view-cell mui-collapse mui-active">
+					<li class="mui-table-view-cell mui-collapse">
 						<a class="mui-navigate-right" href="#">条码信息</a>
 						<div class="mui-collapse-content">
 							<p>客户简称:&nbsp; <span id="cust_s"></span></p>
@@ -47,11 +47,11 @@
 					</li>
 				</ul>
 				<div class="mui-input-row">
-					<label>抽检总量(PCS)</label>
+					<label>抽检总量</label>
 					<input id="checkTot" placeholder="请输入抽检总量(PCS)" type="text" class="mui-input-clear">
 				</div>
 				<div class="mui-input-row">
-					<label>不良总量(PCS)</label>
+					<label>不良总量</label>
 					<input id="badTot" placeholder="请输入不良总量(PCS)" type="text" class="mui-input-clear">
 				</div>
 				<div class="mui-input-row">
@@ -115,7 +115,7 @@
 			aj.post('produce/inspect/getProcList', {
 				company: api_localStorageGet("company"),
 				factory: api_localStorageGet("factory"),
-				keyword: ""
+				keyword: "" 
 			}, function(data) {
 				//console.log(JSON.stringify(data))
 				if (data.result) {
@@ -158,10 +158,10 @@
 							var arr = {};
 							arr["boxCode"] = $("#boxCode").val();
 							arr["qty"] = list[0].QTY;
-							if (barcodeList.length >= 11) {
-								mui.alert("一次最多提交10个箱条码")
-								return false;
-							}
+							// if (barcodeList.length >= 11) {
+							// 	mui.alert("一次最多提交10个箱条码")
+							// 	return false;
+							// }
 							barcodeList.push(arr);
 							document.getElementById('barcodeId').innerHTML = template('template', {
 								"record": barcodeList
