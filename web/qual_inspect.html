@@ -52,14 +52,14 @@
 				</div>
 				<div class="mui-input-row">
 					<label>不良总量</label>
-					<input id="badTot" placeholder="请输入不良总量(PCS)" type="text" class="mui-input-clear">
+					<input id="badTot" placeholder="请输入不良总量(PCS)" value="0" type="text" class="mui-input-clear">
 				</div>
 				<div class="mui-input-row">
 					<label>检验结果</label>
 					<span class="radio_inline mui-radio">
 						<input name="radio1" type="radio" id="A" value="A" checked>
 						<label for="A">合格</label>
-						<input name="radio1" type="radio" id="B" value="A">
+						<input name="radio1" type="radio" id="B" value="B">
 						<label for="B">不合格</label>
 					</span>
 				</div>
@@ -142,7 +142,7 @@
 						proc: $("#selectPoint").val(),
 						barcode: $("#boxCode").val()
 					}, function(data) {
-						console.log(JSON.stringify(data))
+						//console.log(JSON.stringify(data))
 						if (data.result) {
 							var list = data.data;
 							$("#cust_s").text(list[0].CUST_NAME_S);
@@ -231,19 +231,30 @@
 			var depart = $("#selectDepart").val();
 			var badContent = $("#badContent").val();
 
-			if (proc == "" || chkTotal == "" || badTotal == "" || depart == "" || barcodeList.length == 0) {
+			if (proc == "" || chkTotal == "" || badTotal == "") {
 				mui.alert("请完善数据")
 				return false;
+			}
+			if(chkResult=="不合格"){
+				if(depart == "" || barcodeList.length == 0){
+					mui.alert("检验结果不合格，需填入责任部门和不良内容。")
+					return false;
+				}else if(badTotal == "0"|| badTotal == ""){
+					mui.alert("检验结果不合格，需填入不良总量。")
+					return false;
+				}
+			}
+			if(badContent!= null){
+				var badList="";
+				for (var i = 0; i < badContent.length; i++) {
+					badList += badContent[i] + ","
+				}
+				badList = badList.substring(0, badList.length - 1);
 			}
 			var codeList = "";
 			for (var i = 1; i < barcodeList.length; i++) {
 				codeList += barcodeList[i].boxCode + ","
 			}
-			var badList="";
-			for (var i = 0; i < badContent.length; i++) {
-				badList += badContent[i] + ","
-			}
-			badList = badList.substring(0, badList.length - 1);
 			codeList = codeList.substring(0, codeList.length - 1);
 			//console.log(proc+"/"+ chkTotal+"/"+ badTotal+"/"+ chkResult+"/"+depart+"/"+badContent+"/"+codeList)
 			saveChkData(proc, chkTotal, badTotal, chkResult, depart, badList, codeList);
