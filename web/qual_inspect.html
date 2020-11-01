@@ -117,7 +117,7 @@
 				factory: api_localStorageGet("factory"),
 				keyword: "" 
 			}, function(data) {
-				//console.log(JSON.stringify(data))
+				console.log(JSON.stringify(data))
 				if (data.result) {
 					var list = data.data;
 					for (var i = 0; i < list.length; i++) {
@@ -183,14 +183,14 @@
 				factory: api_localStorageGet("factory"),
 				keyword: ""
 			}, function(data) {
-				//console.log(JSON.stringify(data))
+				console.log(JSON.stringify(data))
 				if (data.result) {
 					var list = data.data;
 					for (var i = 0; i < list.length; i++) {
 						if (i == 0) {
 							$("#selectDepart").append("<option value=''>请选择责任部门</option>");
 						}
-						$("#selectDepart").append("<option value=" + list[i].ID + ">" + list[i].ORG_NAME + "</option>");
+						$("#selectDepart").append("<option value=" + list[i].ID + ">" + list[i].LEAD_BY + "</option>");
 					}
 				} else {
 					mui.alert(data.msg)
