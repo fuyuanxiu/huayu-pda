@@ -73,15 +73,56 @@
 						</span>
 					</a>
 				</div>
-				<div class="mui-input-row">
+				<!-- <div class="mui-input-row">
 					<label>不良内容</label>
 					<a class="mui-navigate-right">
 						<span class="mui-badge1">
 							<select class="mui-h5" style="margin:auto; color:#000;" id="badContent" multiple>
 							</select>
 						</span>
-					</a>
-				</div>
+					</a> 
+				</div> -->
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell mui-collapse">
+						<a class="mui-navigate-right" href="#">不良内容<span>（已增加2条记录）</span></a>
+						<div class="mui-collapse-content">
+							<form class="mui-input-group" id="formId">
+								<div class="mui-input-row ">
+									<label>不良内容</label>
+									<a class="mui-navigate-right">
+										<span class="mui-badge1">
+											<select class="mui-h5" style="margin:auto; color:#000;" id="badContent">
+											</select>
+										</span>
+									</a>
+								</div>
+								<div class="mui-input-row ">
+									<label>不良数量</label>
+									<input id="badNum" placeholder="请输入对应不良数量"  type="text" class="mui-input-clear">
+								</div>
+								<div class="mui-content-padded" align="center">
+									<button style="margin-right: 0.525rem; float: left;width: 45%;"type="button" class="mui-btn mui-btn-primary" id="saveBad">保存</button>
+									<button style="width: 45%;" type="reset" class="mui-btn mui-btn" >重置</button>
+								</div>
+							</form> 
+							<div>
+								<ul class="mui-table-view" id="bad_ul">
+									<li class="mui-table-view-cell">不良原因
+										<span class="mui-badge mui-badge-primary">数量</span>
+									</li>
+									<li class="mui-table-view-cell">短线
+										<!-- <span style="margin-right: 1px;" class="mui-icon mui-icon-close"></span>脱线 -->
+										<span class="mui-badge mui-badge-primary">2</span>
+									</li>
+									<li class="mui-table-view-cell">脱线
+										<!-- <span style="margin-right: 1px;" class="mui-icon mui-icon-close"></span>短线 -->
+										<span class="mui-badge mui-badge-primary">6</span>
+									</li>
+								</ul>	
+							</div>
+						</div>
+					</li>
+				</ul>
 				<ul class="mui-table-view" id="barcodeId">
 				</ul>
 				<script id='template' type="text/template">
@@ -100,24 +141,25 @@
 	</body>
 	<script>
 		mui.init();
-		var barcodeList = [];
+		var barcodeList = [];//条码集
+		var badContenList=[];//不良内容集
 		mui.plusReady(function() {
 			getProcList(); //获取检验节点列表
 			getDepartList(); //获取责任部门列表、
 			getBadList(); //获取不良内容列表
 		})
-		$("#badContent").change(function() {
-			var bad = $("#badContent").val()
-			console.log(bad)
-		})
+		// $("#badContent").change(function() {
+		// 	var bad = $("#badContent").val()
+		// 	//console.log(bad)
+		// })
 
 		function getProcList() { //获取检验节点列表
 			aj.post('produce/inspect/getProcList', {
 				company: api_localStorageGet("company"),
 				factory: api_localStorageGet("factory"),
-				keyword: "" 
+				keyword: ""
 			}, function(data) {
-				console.log(JSON.stringify(data))
+				//console.log(JSON.stringify(data))
 				if (data.result) {
 					var list = data.data;
 					for (var i = 0; i < list.length; i++) {
@@ -183,7 +225,7 @@
 				factory: api_localStorageGet("factory"),
 				keyword: ""
 			}, function(data) {
-				console.log(JSON.stringify(data))
+				//console.log(JSON.stringify(data))
 				if (data.result) {
 					var list = data.data;
 					for (var i = 0; i < list.length; i++) {
@@ -208,9 +250,9 @@
 				if (data.result) {
 					var list = data.data;
 					for (var i = 0; i < list.length; i++) {
-						// if (i == 0) {
-						// 	$("#badContent").append("<option disabled value=''>请选择不良内容</option>");
-						// }
+						if (i == 0) {
+							$("#badContent").append("<option value=''>请选择不良内容</option>");
+						}
 						$("#badContent").append("<option value=" + list[i].DEFECT_CODE + ">" + list[i].DEFECT_NAME + "</option>");
 					}
 				} else {
@@ -235,17 +277,17 @@
 				mui.alert("请完善数据")
 				return false;
 			}
-			if(chkResult=="不合格"){
-				if(depart == "" || barcodeList.length == 0){
+			if (chkResult == "不合格") {
+				if (depart == "" || barcodeList.length == 0) {
 					mui.alert("检验结果不合格，需填入责任部门和不良内容。")
 					return false;
-				}else if(badTotal == "0"|| badTotal == ""){
+				} else if (badTotal == "0" || badTotal == "") {
 					mui.alert("检验结果不合格，需填入不良总量。")
 					return false;
 				}
 			}
-			if(badContent!= null){
-				var badList="";
+			if (badContent != null) {
+				var badList = "";
 				for (var i = 0; i < badContent.length; i++) {
 					badList += badContent[i] + ","
 				}
@@ -265,17 +307,18 @@
 				company: api_localStorageGet("company"),
 				factory: api_localStorageGet("factory"),
 				user_id: api_localStorageGet("code"),
-				proc:proc,
-				barcodeList:codeList,
-				checkTotal:chkTotal,
-				badTotal:badTotal,
-				chkResult:chkResult,
-				departCode:depart,
+				proc: proc,
+				barcodeList: codeList,
+				checkTotal: chkTotal,
+				badTotal: badTotal,
+				chkResult: chkResult,
+				departCode: depart,
 				badList: badList
 			}, function(data) {
 				console.log(JSON.stringify(data))
 				if (data.result) {
-					mui.alert("数据保存成功")
+					mui.alert("数据保存成功");
+					toClean();
 				} else {
 					mui.alert(data.msg)
 				}
