@@ -48,11 +48,11 @@
 				</ul>
 				<div class="mui-input-row">
 					<label>抽检总量</label>
-					<input id="checkTot" placeholder="请输入抽检总量(PCS)" type="text" class="mui-input-clear">
+					<input id="checkTot" placeholder="请输入抽检总量(PCS)" type="text" class="mui-input-clear" onkeyup="value=(value.replace(/\D/g,'')==''?'':parseInt(value))">
 				</div>
 				<div class="mui-input-row">
 					<label>不良总量</label>
-					<input id="badTot" placeholder="请输入不良总量(PCS)" value="0" type="text" class="mui-input-clear">
+					<input id="badTot" placeholder="请输入不良总量(PCS)" value="0" type="text" class="mui-input-clear" onkeyup="value=(value.replace(/\D/g,'')==''?'':parseInt(value))">
 				</div>
 				<div class="mui-input-row">
 					<label>检验结果</label>
@@ -84,7 +84,7 @@
 				</div> -->
 				<ul class="mui-table-view">
 					<li class="mui-table-view-cell mui-collapse">
-						<a class="mui-navigate-right" href="#">不良内容<span>（已增加2条记录）</span></a>
+						<a class="mui-navigate-right" href="#">不良内容<span id="recordNum">（已增加0条记录）</span></a>
 						<div class="mui-collapse-content">
 							<form class="mui-input-group" id="formId">
 								<div class="mui-input-row ">
@@ -98,27 +98,27 @@
 								</div>
 								<div class="mui-input-row ">
 									<label>不良数量</label>
-									<input id="badNum" placeholder="请输入对应不良数量"  type="text" class="mui-input-clear">
+									<input id="badNum" placeholder="请输入对应不良数量" type="text" class="mui-input-clear" onkeyup="value=(value.replace(/\D/g,'')==''?'':parseInt(value))">
 								</div>
 								<div class="mui-content-padded" align="center">
-									<button style="margin-right: 0.525rem; float: left;width: 45%;"type="button" class="mui-btn mui-btn-primary" id="saveBad">保存</button>
-									<button style="width: 45%;" type="reset" class="mui-btn mui-btn" >重置</button>
+									<button style="margin-right: 0.525rem; float: left;width: 45%;" type="button" class="mui-btn mui-btn-primary"
+									 id="saveBad">保存</button>
+									<button style="width: 45%;" type="reset" class="mui-btn mui-btn">重置</button>
 								</div>
-							</form> 
+							</form>
 							<div>
 								<ul class="mui-table-view" id="bad_ul">
-									<li class="mui-table-view-cell">不良原因
-										<span class="mui-badge mui-badge-primary">数量</span>
+								</ul>
+								<script id='bd-template' type="text/template">
+									<% for(var i in record){ var item=record[i];%>
+									<li class="mui-table-view-cell">(<%=(item.badItem)%>)<%=(item.badName)%>
+										<span class="mui-badge mui-badge-primary"><%=(item.qty)%></span>
 									</li>
-									<li class="mui-table-view-cell">短线
-										<!-- <span style="margin-right: 1px;" class="mui-icon mui-icon-close"></span>脱线 -->
-										<span class="mui-badge mui-badge-primary">2</span>
-									</li>
-									<li class="mui-table-view-cell">脱线
-										<!-- <span style="margin-right: 1px;" class="mui-icon mui-icon-close"></span>短线 -->
-										<span class="mui-badge mui-badge-primary">6</span>
-									</li>
-								</ul>	
+									<%}%>
+								</script>
+								<!-- <li class="mui-table-view-cell">不良原因
+									<span class="mui-badge mui-badge-primary">数量</span>
+								</li> -->
 							</div>
 						</div>
 					</li>
@@ -141,8 +141,8 @@
 	</body>
 	<script>
 		mui.init();
-		var barcodeList = [];//条码集
-		var badContenList=[];//不良内容集
+		var barcodeList = []; //条码集
+		var badContenList = []; //不良内容集
 		mui.plusReady(function() {
 			getProcList(); //获取检验节点列表
 			getDepartList(); //获取责任部门列表、
@@ -152,6 +152,38 @@
 		// 	var bad = $("#badContent").val()
 		// 	//console.log(bad)
 		// })
+
+		$("#saveBad").click(function() {
+			var bad_content = $("#badContent").val();
+			var bad_num = $("#badNum").val();
+			var bad_name = $("#badContent option:checked").text();
+			if (bad_content == "" || bad_num == "") {
+				mui.alert("请完善不良信息")
+				return false;
+			}
+			if (badContenList.length == 0) {
+				var arr = {};
+				//arr["badName"] = "不良原因";
+				arr["badItem"] = "不良原因";
+				arr["qty"] = "数量";
+				badContenList.push(arr);
+			}
+			var arr = {};
+			arr["badName"] = bad_name;
+			arr["badItem"] = bad_content;
+			arr["qty"] = bad_num;
+
+			badContenList.push(arr);
+			var count = badContenList.length - 1
+			var string = "（已增加" + count + "条记录）"
+			$("#recordNum").text(string);
+			$("#badContent").val("");
+			$("#badNum").val("");
+			mui.alert("添加不良信息成功")
+			document.getElementById('bad_ul').innerHTML = template('bd-template', {
+				"record": badContenList
+			});
+		})
 
 		function getProcList() { //获取检验节点列表
 			aj.post('produce/inspect/getProcList', {
@@ -271,34 +303,42 @@
 				chkResult = "不合格"
 			}
 			var depart = $("#selectDepart").val();
-			var badContent = $("#badContent").val();
+			var badContent = badContenList;
 
 			if (proc == "" || chkTotal == "" || badTotal == "") {
 				mui.alert("请完善数据")
 				return false;
 			}
+			if (badTotal >0 && chkResult == "合格") {
+				mui.alert("不良总量数量大于0，请选择检验结果不合格。")
+				return false;
+			}
 			if (chkResult == "不合格") {
-				if (depart == "" || barcodeList.length == 0) {
-					mui.alert("检验结果不合格，需填入责任部门和不良内容。")
+				if (depart == "" || badContent.length == 0) {
+					mui.alert("检验结果不合格，需填入责任部门和不良信息。")
 					return false;
 				} else if (badTotal == "0" || badTotal == "") {
 					mui.alert("检验结果不合格，需填入不良总量。")
 					return false;
 				}
 			}
-			if (badContent != null) {
+
+			if (badContent.length != 0 || badContent.length != 1) {
 				var badList = "";
-				for (var i = 0; i < badContent.length; i++) {
-					badList += badContent[i] + ","
+				for (var i = 1; i < badContent.length; i++) {
+					badList += badContent[i].badItem + "@" + badContent[i].qty + ","
 				}
 				badList = badList.substring(0, badList.length - 1);
 			}
 			var codeList = "";
+			//console.log(JSON.stringify(barcodeList))
 			for (var i = 1; i < barcodeList.length; i++) {
 				codeList += barcodeList[i].boxCode + ","
+				console.log(codeList)
 			}
 			codeList = codeList.substring(0, codeList.length - 1);
-			//console.log(proc+"/"+ chkTotal+"/"+ badTotal+"/"+ chkResult+"/"+depart+"/"+badContent+"/"+codeList)
+			console.log(proc + "/" + chkTotal + "/" + badTotal + "/" + chkResult + "/" + depart + "/" + badList + "/" +
+				codeList)
 			saveChkData(proc, chkTotal, badTotal, chkResult, depart, badList, codeList);
 		})
 
@@ -324,26 +364,41 @@
 				}
 			})
 		}
-
+		//敲回车切换下一栏事件
+		$("#boxCode").bind('keyup',function(event){
+			if (event.keyCode == "13") {
+				$('#boxCode').focus();
+				$('#boxCode').val("");
+			}
+		})
+		$("#checkTot").bind('keyup',function(event){
+			if (event.keyCode == "13") {
+				$('#badTot').focus();
+			}
+		})
+		
 		$("#clearData").click(function() {
+			$("#selectPoint").val("");
 			toClean();
 		})
 
 		function toClean() {
-			$("#selectPoint").val("");
 			$("#boxCode").val("");
 			$("#cust_s").text("");
 			$("#devType").text("");
 			$("#liner").text("");
 			$("#badPer").text("");
 			$("#checkTot").val("");
-			$("#badTot").val("")
+			$("#badTot").val("0")
 			barcodeList = [];
 			document.getElementById('barcodeId').innerHTML = template('template', {
 				"record": barcodeList
 			});
+			badContenList = [];
+			document.getElementById('bad_ul').innerHTML = template('bd-template', {
+				"record": badContenList
+			});
 			$("#selectDepart").val("");
-			$("#badContent").val(null);
 			//-----无法重置到合格项
 			$("input[name='radio1'][value=A]").attr("checked", true);
 		}
