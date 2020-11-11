@@ -1,5 +1,5 @@
 var API = window.API = {
-	//webPath: "http://192.168.0.109:8082/",//test
+	//webPath: "http://192.168.2.105:8082/",//test
 	//webPath: "http://192.168.1.160:9997/",
 	webPath: "http://192.168.0.21:8081/",//offical
 	version: "test", //demo:静态，prod:正式，test:测试

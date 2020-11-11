@@ -111,9 +111,16 @@
 								</ul>
 								<script id='bd-template' type="text/template">
 									<% for(var i in record){ var item=record[i];%>
-									<li class="mui-table-view-cell">(<%=(item.badItem)%>)<%=(item.badName)%>
+									{{if i==0}}
+									<li class="mui-table-view-cell"><%=(item.badItem)%> 
 										<span class="mui-badge mui-badge-primary"><%=(item.qty)%></span>
 									</li>
+									{{else}}
+									<li class="mui-table-view-cell" data-bad='<%=(item)%>' data-index='<%=(i)%>'>
+									<span class="mui-icon mui-icon-close"></span>(<%=(item.badItem)%>)<%=(item.badName)%>
+										<span class="mui-badge mui-badge-primary"><%=(item.qty)%></span>
+									</li>
+									{{/if}}
 									<%}%>
 								</script>
 								<!-- <li class="mui-table-view-cell">不良原因
@@ -152,6 +159,31 @@
 		// 	var bad = $("#badContent").val()
 		// 	//console.log(bad)
 		// })
+		mui("#bad_ul").on("tap", "li", function() {
+			var bad_data = this.getAttribute('data-bad'); //被选中项
+			var index = this.getAttribute('data-index'); //下标
+
+			if (bad_data == null) {
+				return false;
+			}
+			bad_data = JSON.parse(bad_data)
+			mui.confirm("是否要删除【" + bad_data.badName + "，数量" + bad_data.qty + "】不良记录？", "提示", ['否', '是'], function(e) {
+				if (e.index == 1) {
+					badContenList.splice(index, 1);
+					var count = badContenList.length - 1
+					if (badContenList.length == 1) {
+						badContenList.splice(0, 1);//去除表头
+					}
+					mui.alert("删除成功")
+					document.getElementById('bad_ul').innerHTML = template('bd-template', {
+						"record": badContenList
+					});
+					var string = "（已增加" + count + "条记录）"
+					$("#recordNum").text(string);
+				}
+			})
+
+		})
 
 		$("#saveBad").click(function() {
 			var bad_content = $("#badContent").val();
@@ -179,7 +211,7 @@
 			$("#recordNum").text(string);
 			$("#badContent").val("");
 			$("#badNum").val("");
-			mui.alert("添加不良信息成功")
+			mui.toast("添加成功")
 			document.getElementById('bad_ul').innerHTML = template('bd-template', {
 				"record": badContenList
 			});
@@ -240,6 +272,8 @@
 							document.getElementById('barcodeId').innerHTML = template('template', {
 								"record": barcodeList
 							});
+							$('#boxCode').focus();
+							$('#boxCode').val("");
 						} else {
 							$("#boxCode").val("");
 							mui.alert(data.msg)
@@ -309,7 +343,7 @@
 				mui.alert("请完善数据")
 				return false;
 			}
-			if (badTotal >0 && chkResult == "合格") {
+			if (badTotal > 0 && chkResult == "合格") {
 				mui.alert("不良总量数量大于0，请选择检验结果不合格。")
 				return false;
 			}
@@ -365,18 +399,13 @@
 			})
 		}
 		//敲回车切换下一栏事件
-		$("#boxCode").bind('keyup',function(event){
-			if (event.keyCode == "13") {
-				$('#boxCode').focus();
-				$('#boxCode').val("");
-			}
-		})
-		$("#checkTot").bind('keyup',function(event){
+
+		$("#checkTot").bind('keyup', function(event) {
 			if (event.keyCode == "13") {
 				$('#badTot').focus();
 			}
 		})
-		
+
 		$("#clearData").click(function() {
 			$("#selectPoint").val("");
 			toClean();
