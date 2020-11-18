@@ -36,13 +36,11 @@
 					<input id="boxCode" placeholder="请扫描" type="text" class="mui-input-clear">
 				</div>
 				<ul class="mui-table-view">
-					<li class="mui-table-view-cell mui-collapse">
+					<li class="mui-table-view-cell mui-collapse mui-active">
 						<a class="mui-navigate-right" href="#">条码信息</a>
 						<div class="mui-collapse-content">
-							<p>客户简称:&nbsp; <span id="cust_s"></span></p>
-							<p>机型:&nbsp;<span id="devType"></span></p>
-							<p>组长:&nbsp;<span id="liner"></span></p>
-							<p>不良率:&nbsp;<span id="badPer"></span></p>
+								<p style="font-size: 1.005rem;">箱数:&nbsp;<span id="boxCount"></span></p>
+								<p style="font-size: 1.005rem;">产品总数:&nbsp; <span id="sum"></span></p>
 						</div>
 					</li>
 				</ul>
@@ -103,7 +101,7 @@
 								<div class="mui-content-padded" align="center">
 									<button style="margin-right: 0.525rem; float: left;width: 45%;" type="button" class="mui-btn mui-btn-primary"
 									 id="saveBad">保存</button>
-									<button style="width: 45%;" type="reset" class="mui-btn mui-btn">重置</button>
+									<button style="width: 45%;" type="button" class="mui-btn mui-btn" id="resetBad">重置</button>
 								</div>
 							</form>
 							<div>
@@ -117,7 +115,7 @@
 									</li>
 									{{else}}
 									<li class="mui-table-view-cell" data-bad='<%=(item)%>' data-index='<%=(i)%>'>
-									<span class="mui-icon mui-icon-close"></span>(<%=(item.badItem)%>)<%=(item.badName)%>
+									<span class="mui-icon mui-icon-close"></span><%=(item.badName)%>
 										<span class="mui-badge mui-badge-primary"><%=(item.qty)%></span>
 									</li>
 									{{/if}}
@@ -134,9 +132,15 @@
 				</ul>
 				<script id='template' type="text/template">
 					<% for(var i in record){ var item=record[i];%>
+					{{if i==0}},
 					<li class="mui-table-view-cell"><%=(item.boxCode)%>
 						<span class="mui-badge mui-badge-success"><%=(item.qty)%></span>
 					</li>
+					{{else}}
+					<li class="mui-table-view-cell" data-code='<%=(item)%>' data-index='<%=(i)%>'><span class="mui-icon mui-icon-close"></span><%=(item.boxCode)%>
+						<span class="mui-badge mui-badge-success"><%=(item.qty)%></span>
+					</li>
+					{{/if}}
 					<%}%>
 				</script>
 			</form>
@@ -150,15 +154,26 @@
 		mui.init();
 		var barcodeList = []; //条码集
 		var badContenList = []; //不良内容集
+		var badItemSum = 0; //录入的不良内容总数
+		var barcodeItemSum = 0; //录入的条码数量之和，产品总数
 		mui.plusReady(function() {
 			getProcList(); //获取检验节点列表
 			getDepartList(); //获取责任部门列表、
 			getBadList(); //获取不良内容列表
 		})
-		// $("#badContent").change(function() {
-		// 	var bad = $("#badContent").val()
-		// 	//console.log(bad)
-		// })
+
+		window.addEventListener("changeBar", function(e) {
+			var inputId = e.detail.inputId
+			document.getElementById(inputId).value = e.detail.barcode;
+			if (inputId == "boxCode") {
+				doCheckBarCode();
+			}
+		});
+
+		$("#selectPoint").change(function() {
+			toClean();
+		})
+		//不良信息删除
 		mui("#bad_ul").on("tap", "li", function() {
 			var bad_data = this.getAttribute('data-bad'); //被选中项
 			var index = this.getAttribute('data-index'); //下标
@@ -169,10 +184,11 @@
 			bad_data = JSON.parse(bad_data)
 			mui.confirm("是否要删除【" + bad_data.badName + "，数量" + bad_data.qty + "】不良记录？", "提示", ['否', '是'], function(e) {
 				if (e.index == 1) {
+					badItemSum=badItemSum-parseInt(bad_data.qty);//更新不良总数
 					badContenList.splice(index, 1);
 					var count = badContenList.length - 1
 					if (badContenList.length == 1) {
-						badContenList.splice(0, 1);//去除表头
+						badContenList.splice(0, 1); //去除表头
 					}
 					mui.alert("删除成功")
 					document.getElementById('bad_ul').innerHTML = template('bd-template', {
@@ -182,15 +198,52 @@
 					$("#recordNum").text(string);
 				}
 			})
-
+		})
+		//条码删除
+		mui("#barcodeId").on("tap", "li", function() {
+			var code_data = this.getAttribute('data-code'); //被选中项
+			var index = this.getAttribute('data-index'); //下标
+			if (code_data == null) {
+				return false;
+			}
+			code_data = JSON.parse(code_data)
+			mui.confirm("是否要删除【" + code_data.boxCode + "】条码？", "提示", ['否', '是'], function(e) {
+				if (e.index == 1) {
+					console.log(barcodeItemSum)
+					barcodeItemSum=parseInt(barcodeItemSum)-parseInt(code_data.qty);//更新生产总数
+					console.log(barcodeItemSum)
+					barcodeList.splice(index, 1);
+					var count = barcodeList.length - 1;//更新条码记录数
+					if (barcodeList.length == 1) {
+						barcodeList.splice(0, 1); //去除表头
+					}
+					mui.alert("删除成功");
+					document.getElementById('barcodeId').innerHTML = template('template', {
+						"record": barcodeList
+					});
+					var string = "已录入【" + count + "】箱"
+					$("#sum").text("已录入【"+barcodeItemSum+"】");
+					$("#boxCount").text(string);
+				}
+			})
 		})
 
+
 		$("#saveBad").click(function() {
+			var bad_tot = $("#badTot").val();
+			if (bad_tot == "" || bad_tot == "0") {
+				mui.alert("请先输入不良总量");
+				return false
+			}
 			var bad_content = $("#badContent").val();
 			var bad_num = $("#badNum").val();
 			var bad_name = $("#badContent option:checked").text();
+			var result = parseInt(badItemSum) + parseInt(bad_num); //预先检查录入的不良的总数量是否小于等于不良总数
 			if (bad_content == "" || bad_num == "") {
 				mui.alert("请完善不良信息")
+				return false;
+			} else if (bad_tot < result) {
+				mui.alert("录入不良数量已超出大于不良总量，请检查")
 				return false;
 			}
 			if (badContenList.length == 0) {
@@ -200,14 +253,24 @@
 				arr["qty"] = "数量";
 				badContenList.push(arr);
 			}
+			//判断不良内容是否有重复
+			for (var i = 1; i < badContenList.length; i++) {
+				if (badContenList[i].badName == bad_name) {
+					mui.alert("不良内容【" + bad_name + "】已存在，请勿重复添加", function() {
+						$("#badContent").val("");
+						$("#badNum").val("");
+					})
+					return false;
+				}
+			}
 			var arr = {};
 			arr["badName"] = bad_name;
 			arr["badItem"] = bad_content;
 			arr["qty"] = bad_num;
-
 			badContenList.push(arr);
-			var count = badContenList.length - 1
-			var string = "（已增加" + count + "条记录）"
+			var count = badContenList.length - 1;
+			var string = "（已增加" + count + "条记录）";
+			badItemSum = parseInt(badItemSum) + parseInt(bad_num) //记录已录入的不良总数量
 			$("#recordNum").text(string);
 			$("#badContent").val("");
 			$("#badNum").val("");
@@ -239,51 +302,69 @@
 		}
 
 		$("#boxCode").bind('keyup', function(event) {
-			if (event.keyCode == "13") { //输入回车执行
-				if ($("#selectPoint").val() != "" && $("#boxCode").val() != "") {
-					aj.post('produce/inspect/scanBarcode', {
-						company: api_localStorageGet("company"),
-						factory: api_localStorageGet("factory"),
-						user_id: api_localStorageGet("code"),
-						proc: $("#selectPoint").val(),
-						barcode: $("#boxCode").val()
-					}, function(data) {
-						//console.log(JSON.stringify(data))
-						if (data.result) {
-							var list = data.data;
-							$("#cust_s").text(list[0].CUST_NAME_S);
-							$("#devType").text(list[0].ITEM_MODEL);
-							$("#liner").text(list[0].LINER_NAME);
-							$("#badPer").text("");
-							if (barcodeList.length == 0) {
-								var arr = {};
-								arr["boxCode"] = "箱号条码";
-								arr["qty"] = "数量";
-								barcodeList.push(arr);
-							}
-							var arr = {};
-							arr["boxCode"] = $("#boxCode").val();
-							arr["qty"] = list[0].QTY;
-							// if (barcodeList.length >= 11) {
-							// 	mui.alert("一次最多提交10个箱条码")
-							// 	return false;
-							// }
-							barcodeList.push(arr);
-							document.getElementById('barcodeId').innerHTML = template('template', {
-								"record": barcodeList
-							});
-							$('#boxCode').focus();
-							$('#boxCode').val("");
-						} else {
-							$("#boxCode").val("");
-							mui.alert(data.msg)
-						}
-					})
-				} else {
-					mui.alert("请先完善数据")
-				}
+			if (event.keyCode == "13" || event.keyCode == "9") { //输入回车执行
+				doCheckBarCode()
 			}
 		})
+
+		function doCheckBarCode() { //扫描条码-执行操作
+			var box_code = $("#boxCode").val();
+			if ($("#selectPoint").val() != "" && box_code != "") {
+				aj.post('produce/inspect/scanBarcode', {
+					company: api_localStorageGet("company"),
+					factory: api_localStorageGet("factory"),
+					user_id: api_localStorageGet("code"),
+					proc: $("#selectPoint").val(),
+					barcode: box_code
+				}, function(data) {
+					console.log(JSON.stringify(data))
+					if (data.result) {
+						var list = data.data;
+						//增加表头字段
+						if (barcodeList.length == 0) {
+							var arr = {};
+							arr["boxCode"] = "箱号条码";
+							arr["qty"] = "数量";
+							barcodeList.push(arr);
+						}
+						//检查条码是否重复
+						for (var i = 1; i < barcodeList.length; i++) {
+							if (barcodeList[i].boxCode == box_code) {
+								mui.alert("条码【" + box_code + "】已存在，请勿重复扫描", function() {
+									$('#boxCode').focus();
+									$('#boxCode').val("");
+								})
+								return false;
+							}
+						}
+						var arr = {};
+						arr["boxCode"] = box_code;
+						arr["qty"] = list[0].QTY;
+						// if (barcodeList.length >= 1001) {
+						// 	mui.alert("一次最多提交100个箱条码")
+						// 	return false;
+						// }
+						barcodeList.push(arr);
+						var count = barcodeList.length - 1;
+						var string = "已录入【" + count + "】箱";
+						barcodeItemSum = parseInt(barcodeItemSum) + parseInt(list[0].QTY);
+						var string2 = "已录入【" + barcodeItemSum + "】"
+						$("#sum").text(string2); //产品总数
+						$("#boxCount").text(string); //箱数（条码记录数）
+						document.getElementById('barcodeId').innerHTML = template('template', {
+							"record": barcodeList
+						});
+						$('#boxCode').focus();
+						$('#boxCode').val("");
+					} else {
+						$("#boxCode").val("");
+						mui.alert(data.msg)
+					}
+				})
+			} else {
+				mui.alert("请先完善数据")
+			}
+		}
 
 		function getDepartList() {
 			aj.post('produce/inspect/getDepatrList', {
@@ -410,6 +491,11 @@
 			$("#selectPoint").val("");
 			toClean();
 		})
+		
+		$("#resetBad").click(function(){
+			$("#badContent").val("");
+			$("#badNum").val("");
+		})
 
 		function toClean() {
 			$("#boxCode").val("");
@@ -428,6 +514,14 @@
 				"record": badContenList
 			});
 			$("#selectDepart").val("");
+			badItemSum = 0;//记录已录入的不良总数量
+			barcodeItemSum=0;
+			$("#sum").text("");
+			$("#boxCount").text("");
+			
+			$("#recordNum").text("（已增加0条记录）");
+			$("#badContent").val("");
+			$("#badNum").val("");
 			//-----无法重置到合格项
 			$("input[name='radio1'][value=A]").attr("checked", true);
 		}
