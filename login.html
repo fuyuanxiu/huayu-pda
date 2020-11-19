@@ -82,6 +82,7 @@
 			}
 			
 			mui.plusReady(function() {
+				update();//20201119-fyx-更新
 				//getPrintInfo();
 				//20191113-fyx-默认填写上一次登录人账号
 				document.getElementById("username").value = api_localStorageGet("name")
@@ -104,26 +105,18 @@
 					}
 					api_localStorageSave("code", username.value);
 					api_localStorageSave("webPath", API.webPath);
-					//update('nei');
+					
 					doLogin();
 				});
 			})
-			/* 
-			function update(net) {
+		
+			function update() {
 				plus.runtime.getProperty(plus.runtime.appid, function(inf) {
 					ver = inf.version;
-					jQueryWeb("PdaCheckVersion", {}, function(xmlHttpRequest, status) {
+					/* jQueryWeb("queryAppVersion", {}, function(xmlHttpRequest, status) {
 						if (status == 'success') {
-							//var json_obj = $.xml2json(xmlHttpRequest.responseXML);
-							//var data = json_obj.diffgram.NewDataSet.Table
-
-							if (data.VERSION > ver) {
-								//console.log('1111')
-								if (net == 'nei') {
-									dowload(data.INTERNALADD);
-								} else {
-									dowload(data.EXTERNALADD);
-								}
+							if (data.VERSION_NO > ver) {
+								dowload(api_localStorageGet("webPath")+data.VERSION_URL);
 								mui('#loadDiv').popover('show');
 							} else {
 								doLogin()
@@ -131,10 +124,40 @@
 						} else {
 							mui.alert("登录验证连接超时");
 						}
+					}) */
+					mui.ajax(API.webPath + 'queryAppVersion', {
+						data: {},
+						dataType: 'json',
+						type: 'POST',
+						timeout: 10000,
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						success: function(data) {
+							console.log(JSON.stringify(data))
+							if (data.result) {
+								if(data.data){
+									if (data.data.VERSION_NO > ver) {
+										console.log(API.webPath+'apk/'+data.data.VERSION_URL)
+										dowload(API.webPath+'apk/'+data.data.VERSION_URL);
+										mui('#loadDiv').popover('show');
+									} else {
+										doLogin()
+									} 
+								}
+								
+							} else {
+								plus.ui.toast(data.msg);
+							}
+						},
+						error: function(xhr, type, errorThrown) {
+							plus.ui.toast('登录失败!失败类型是:' + type);
+							console.log(type)
+						}
 					})
 				});
 
-			}*/
+			}
 
 			function doLogin() {
 				var username = document.getElementById("username");
@@ -189,7 +212,7 @@
 			}
 			
 		   
-/*
+
 			//下载文件
 			function dowload(url) {
 				var options = {
@@ -234,8 +257,8 @@
 
 				dtask.start();
 			}
-			*/
-		   /*
+			
+		 
 			var speed = 0.1;
 
 			function showPer(baifenbi, aln) {
@@ -297,7 +320,7 @@
 				// }());
 				//if (speed > 100) return;
 				speed += 0.2;
-			}*/
+			}
 /*
 			//获取打印信息
 			function getPrintInfo() {
