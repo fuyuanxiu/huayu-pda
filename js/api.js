@@ -1,5 +1,5 @@
 var API = window.API = {
-	//webPath: "http://192.168.0.102:8082/",//test
+	//webPath: "http://192.168.0.105:8082/",//test
 	//webPath: "http://192.168.1.160:9997/",
 	webPath: "http://192.168.0.21:8081/",//offical
 	version: "test", //demo:静态，prod:正式，test:测试
@@ -249,7 +249,9 @@ function GetQueryString(name) {
 	window.aj = {};
 
 	aj.get = function(url, data, success) {
-		ajax("get", API.webPath + url, data, success);
+		var urlA = api_localStorageGet("webPath") + url;
+		//ajax("GET", API.webPath + url, data, success);
+		ajax("GET", urlA, data, success);
 	};
 
 	aj.post = function(url, data, success) {
@@ -257,7 +259,7 @@ function GetQueryString(name) {
 		var urlA = api_localStorageGet("webPath") + url;
 		//console.log(urlA)
 
-		ajax("post", urlA, data, success);
+		ajax("POST", urlA, data, success);
 	};
 
 	var _mask = mui.createMask(); //遮罩层 
@@ -284,7 +286,7 @@ function GetQueryString(name) {
 		mui.ajax(url, {
 			data: data,
 			dataType: 'json',
-			type: 'POST',
+			type: type,
 			timeout: 20000,
 			headers: {},
 			success: success,
@@ -305,6 +307,7 @@ function GetQueryString(name) {
 }(window);
 
 function clicked(url, f1, f2, urlId) {
+	alert(openWindow)
 	mui.openWindow({
 		id: f1,
 		url: url,
