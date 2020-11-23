@@ -3,7 +3,7 @@
     "id" : "H5EBB5752", /*应用的标识，创建应用时自动生成，勿手动修改*/
     "name" : "MES", /*应用名称，程序桌面图标名称*/
     "version" : {
-        "name" : "1.0.21", /*应用版本名称*/
+        "name" : "1.0.23", /*应用版本名称*/
         "code" : 84
     },
     "description" : "", /*应用描述信息*/
@@ -183,10 +183,10 @@
                 "android" : {
                     "mdpi" : "", /*普通屏程序图标，分辨率：48x48*/
                     "ldpi" : "", /*大屏程序图标，分辨率：48x48*/
-                    "hdpi" : "unpackage/img/plee72.png", /*高分屏程序图标，分辨率：72x72*/
-                    "xhdpi" : "unpackage/img/plee96.png", /*720P高分屏程序图标，分辨率：96x96*/
-                    "xxhdpi" : "unpackage/img/plee144.png",
-                    "xxxhdpi" : "unpackage/img/plee192.png"
+                    "hdpi" : "unpackage/img/huayu72.png", /*高分屏程序图标，分辨率：72x72*/
+                    "xhdpi" : "unpackage/img/huayu96.png", /*720P高分屏程序图标，分辨率：96x96*/
+                    "xxhdpi" : "unpackage/img/huayu144.png",
+                    "xxxhdpi" : "unpackage/img/huayu192.png"
                 }
             },
             "splashscreen" : {
