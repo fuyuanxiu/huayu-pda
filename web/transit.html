@@ -83,9 +83,10 @@
 			aj.get('produce/transit/getProc', {
 				company: api_localStorageGet("company"),
 				factory: api_localStorageGet("factory"),
+				userId:api_localStorageGet("code"),//2020-12-01 新增
 				keyword: ""
 			}, function(data) {
-				//console.log(JSON.stringify(data))
+				console.log(JSON.stringify(data))
 				if (data.result) {
 					var list = data.data;
 					for (var i = 0; i < list.length; i++) {

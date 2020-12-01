@@ -284,6 +284,7 @@
 			aj.post('produce/inspect/getProcList', {
 				company: api_localStorageGet("company"),
 				factory: api_localStorageGet("factory"),
+				userId:api_localStorageGet("code"),//2020-12-01 新增
 				keyword: ""
 			}, function(data) {
 				//console.log(JSON.stringify(data))
