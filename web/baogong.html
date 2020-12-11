@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>品质检验</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/api.js"></script>
+		<script src="../js/template-web.js"></script>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/jquery-1.11.1.js"></script>
+		<script src="../js/jquery.xml2json.js.js"></script>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="../css/comment.css" />
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">产出报工</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group" id="formId">
+				<div class="mui-input-row ">
+					<label>制令单</label>
+					<a class="mui-navigate-right">
+						<span class="mui-badge1">
+							<select class="mui-h5" style="margin:auto; color:#000;" id="taskNo">
+							</select>
+						</span>
+					</a>
+				</div>
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell mui-collapse mui-active">
+						<a class="mui-navigate-right" href="#">详细信息</a>
+						<div class="mui-collapse-content">
+							<p style="font-size: 1.005rem;">物料名称:&nbsp;<span id="itemNo"></span></p>
+							<p style="font-size: 1.005rem;">组长:&nbsp; <span id="linerName"></span></p>
+							<p style="font-size: 1.005rem;">制单数量:&nbsp;<span id="qtyPlan"></span></p>
+							<p style="font-size: 1.005rem;">物料名称:&nbsp; <span id="itemName"></span></p>
+						</div>
+					</li>
+				</ul>
+				<div class="mui-input-row">
+					<label>包装类型</label>
+					<a class="mui-navigate-right">
+						<span class="mui-badge1">
+							<select class="mui-h5" style="margin:auto; color:#000;" id="pType">
+								<option value="1">正常扫描</option>
+								<option value="2">合箱扫描</option>
+							</select>
+						</span>
+					</a>
+				</div>
+				<div class="mui-input-row">
+					<label>合箱制令单</label>
+					<a class="mui-navigate-right">
+						<span class="mui-badge1">
+							<select class="mui-h5" style="margin:auto; color:#000;" id="hxTaskNo">
+							</select>
+						</span>
+					</a>
+				</div>
+				<div class="mui-input-row">
+					<label>箱内条码</label>
+					<input id="nbarcode" placeholder="请扫入箱内条码" type="text" class="mui-input-clear">
+				</div>
+				<div class="mui-input-row">
+					<label>箱外条码</label>
+					<input id="wbarcode" placeholder="请扫入箱外条码" type="text" class="mui-input-clear">
+				</div>
+				<ul class="mui-table-view" id="barcodeId">
+
+					<li class="mui-table-view-cell">条码
+						<span style="margin:0 auto ;">(类型)</span>
+						<span class="mui-badge mui-badge-primary">数量</span>
+					</li>
+				</ul>
+			</form>
+		</div>
+	</body>
+	<script>
+		mui.init();
+		mui.plusReady(function() {
+			getProcList(); //获取检验节点列表
+			//getDepartList(); //获取责任部门列表、
+			//getBadList(); //获取不良内容列表
+		})
+
+		window.addEventListener("changeBar", function(e) {
+			var inputId = e.detail.inputId
+			document.getElementById(inputId).value = e.detail.barcode;
+			if (inputId == "boxCode") {
+
+			}
+		});
+		function getProcList() { //获取检验节点列表
+			aj.post('produce/inspect/getProcList', {
+				company: api_localStorageGet("company"),
+				factory: api_localStorageGet("factory"),
+				userId: api_localStorageGet("code"), //2020-12-01 新增
+				keyword: ""
+			}, function(data) {
+				//console.log(JSON.stringify(data))
+				if (data.result) {
+					var list = data.data;
+					for (var i = 0; i < list.length; i++) {
+						if (i == 0) {
+							$("#selectPoint").append("<option value=''>请选择检验节点</option>");
+						}
+						$("#selectPoint").append("<option value=" + list[i].PROC_NO + ">" + list[i].PROC_NAME + "</option>");
+					}
+				} else {
+					mui.alert(data.msg)
+				}
+			})
+		}
+
+
+
+
+
+		function clicked(url, f1, urlId) {
+			OpenWindow(f1, url, {
+				urlId: urlId,
+				inputId: f1
+			});
+		};
+	</script>
+</html>
